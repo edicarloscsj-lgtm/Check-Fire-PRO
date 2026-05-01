@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CheckFire Pro | Inspeção e Relatórios SCI</title>
+  
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Ícones -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#fef2f2', 100: '#fee2e2', 500: '#e63946', 600: '#d90429', 700: '#bf0603', 800: '#990502', 900: '#7a0402' },
+            navy: { 50: '#f0f4f8', 100: '#d9e2ec', 500: '#2b4c7e', 700: '#1a365d', 800: '#1a2942', 900: '#0f172a' }
+          },
+          padding: { 'safe-bottom': 'env(safe-area-inset-bottom)' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Hide radios nativos */
+    .radio-pill input[type="radio"] { display: none; }
+    
+    /* Segment Control UI */
+    .segment-radio input[type="radio"] { display: none; }
+    .segment-radio .segment-label { 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      padding: 10px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; 
+      color: #64748b; font-weight: 700; font-size: 11px; text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .segment-radio input[type="radio"]:checked + .segment-label {
+      border-color: #1a2942; background: #f8fafc; color: #1a2942; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .segment-radio input[type="radio"]:checked + .segment-label i { color: #d90429; }
+
+    /* Inputs invisíveis editáveis in-line */
+    .inline-edit { background: transparent; border: 1px dashed transparent; width: 100%; transition: all 0.2s; text-overflow: ellipsis; outline: none; }
+    .inline-edit:hover { border-color: #cbd5e1; background: #f8fafc; border-radius: 4px; }
+    .inline-edit:focus { border-color: #d90429; background: white; border-radius: 4px; box-shadow: 0 0 0 2px rgba(217, 4, 41, 0.2); }
+
+    /* Componentes App Native */
+    .app-main-container { padding-bottom: 90px; }
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Estilos de Impressão (A4) */
+    .print-page { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; }
+    .print-header { display: grid; grid-template-columns: 45mm 1fr 38mm; border: 1px solid #000; margin-bottom: 6px; min-height: 32mm; }
+    .print-logo { border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; font-size: 9px; font-weight: bold; }
+    .print-logo img { max-width: 100%; max-height: 30mm; object-fit: contain; }
+    .print-title { padding: 5px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
+    .print-title h2 { margin: 0; font-size: 13px; text-transform: uppercase; font-weight: bold; }
+    .print-title p { margin: 0; font-size: 9px; }
+    .print-code { border-left: 1px solid #000; font-size: 8px; }
+    .print-code div { border-bottom: 1px solid #000; padding: 4px; }
+    .print-code div:last-child { border-bottom: 0; }
+
+    .print-info { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid #000; border-bottom: 0; font-size: 8.5px; }
+    .print-info div { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px; min-height: 8.5mm; }
+    .print-info div:nth-child(4n) { border-right: 0; }
+    .print-info strong { display: block; font-size: 7.5px; text-transform: uppercase; margin-bottom: 2px; color: #333; }
+    
+    .print-info-occ { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #000; border-bottom: 0; font-size: 9px; }
+    .print-info-occ div { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; }
+    .print-info-occ div:nth-child(3n) { border-right: 0; }
+    .print-info-occ strong { display: block; font-size: 8px; text-transform: uppercase; margin-bottom: 2px; color: #333; }
+
+    .occ-section-title { background: #f1f5f9; border: 1px solid #000; border-bottom: 0; padding: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; text-align: center; }
+    .occ-textarea-box { border: 1px solid #000; border-bottom: 0; padding: 6px; font-size: 10px; min-height: 25mm; white-space: pre-wrap; }
+
+    .legend { font-size: 8px; margin: 6px 0; display: flex; gap: 12px; flex-wrap: wrap; }
+    .legend strong { text-transform: uppercase; }
+
+    .equipment-print-block { margin-top: 8px; page-break-inside: avoid; border: 1px solid #000; }
+    .equipment-print-title { display: grid; grid-template-columns: 8mm 30mm 25mm 35mm 1fr; background: #f1f5f9; font-size: 8px; font-weight: bold; border-bottom: 1px solid #000; }
+    .equipment-print-title div { padding: 4px; border-right: 1px solid #000; }
+    .equipment-print-title div:last-child { border-right: 0; }
+
+    .subcheck-table { width: 100%; border-collapse: collapse; font-size: 8px; }
+    .subcheck-table th, .subcheck-table td { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px; vertical-align: middle; }
+    .subcheck-table tr:last-child td { border-bottom: 0; }
+    .subcheck-table th:last-child, .subcheck-table td:last-child { border-right: 0; }
+    .subcheck-table th { background: #f8fafc; text-transform: uppercase; font-size: 7.5px; text-align: left; }
+    
+    .compact-ext-table { font-size: 7px; table-layout: fixed; }
+    .compact-ext-table th, .compact-ext-table td { padding: 3px; height: 8mm; }
+    .compact-ext-table .col-num { width: 10mm; }
+    .compact-ext-table .col-local { width: 45mm; }
+    .compact-ext-table .col-desc { width: 25mm; }
+    .compact-ext-table .col-check { width: 13mm; }
+    .compact-ext-table .col-obs { width: 35mm; }
+
+    .vertical-th { height: 38mm !important; padding: 0 !important; text-align: center; vertical-align: bottom !important; position: relative; }
+    .vertical-th > span { display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); white-space: normal; line-height: 1.1; max-height: 36mm; font-size: 6.8px; font-weight: bold; padding: 2px 0; }
+    .mark { text-align: center !important; font-weight: bold; font-size: 10px; }
+
+    .signature-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15mm; margin-top: 16mm; font-size: 9px; page-break-inside: avoid; }
+    .signature-line { border-top: 1px solid #000; text-align: center; padding-top: 4px; }
+
+    /* Toast Notifications */
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast { background: #1a2942; color: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media print {
+      body { background: white; }
+      .no-print { display: none !important; }
+      .print-page { width: auto; min-height: auto; padding: 0; margin: 0; box-shadow: none; border: none; }
+    }
+    
+    @media screen {
+      .print-page { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-radius: 8px; border: 1px solid #e2e8f0; }
+      .input-standard { @apply w-full border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-shadow shadow-sm; }
+      .label-standard { @apply block text-xs font-bold text-navy-800 uppercase tracking-wide mb-1.5; }
+      .nav-item { @apply flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-navy-800 transition-colors gap-1; }
+      .nav-item.active { @apply text-navy-800 font-bold; }
+      .nav-item.active i { @apply text-brand-600 drop-shadow-sm; }
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col h-screen overflow-hidden">
+
+  <div id="toast-container"></div>
+
+  <!-- SVG Logo Oculto para reuso -->
+  <svg class="hidden">
+    <symbol id="brand-shield" viewBox="0 0 100 120">
+      <path d="M50 0 L100 15 L100 70 C100 100 50 120 50 120 C50 120 0 100 0 70 L0 15 Z" fill="#1a2942"/>
+      <path d="M50 0 L0 15 L0 70 C0 85 15 100 50 120 L50 0 Z" fill="#d90429"/>
+      <path d="M50 8 L92 21 L92 68 C92 92 50 108 50 108 C50 108 8 92 8 68 L8 21 Z" fill="#f8fafc"/>
+      <path d="M50 25 C40 35 30 50 38 65 C45 55 50 60 50 60 C50 60 55 45 62 60 C68 45 58 35 50 25 Z" fill="#d90429"/>
+      <path d="M28 55 L42 69 L75 35 L65 25 L42 48 L35 41 Z" fill="#1a2942"/>
+    </symbol>
+  </svg>
+
+  <!-- ================= LANDING PAGE ================= -->
+  <div id="view-landing" class="absolute inset-0 z-50 bg-slate-50 overflow-y-auto no-print flex flex-col">
+    <!-- Navbar Landing -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <svg class="w-10 h-10 drop-shadow-md"><use href="#brand-shield"></use></svg>
+          <div class="flex flex-col">
+            <span class="font-black text-xl tracking-tight text-navy-800 leading-none">Check<span class="text-brand-600">Fire</span> Pro</span>
+            <span class="text-[9px] font-bold tracking-widest text-slate-500 uppercase">Operacional SCI</span>
+          </div>
+        </div>
+        <button onclick="showLogin()" class="text-sm font-bold text-navy-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-colors">
+          Acessar Sistema
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-20 text-center max-w-4xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold mb-6">
+        <i class="ph-fill ph-star"></i> O melhor SaaS para Bombeiros Civis
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-black text-navy-800 tracking-tight leading-tight mb-6">
+        A tecnologia chegou às <span class="text-brand-600">Inspeções e Ocorrências</span>
+      </h1>
+      <p class="text-lg sm:text-xl text-slate-500 mb-10 max-w-2xl leading-relaxed">
+        Gere checklists digitais e relatórios (ROE/RAA/RPI) padronizados em PDF com a sua logo ou formatados diretamente para o WhatsApp.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <a href="https://mpago.la/2Xkmxe6" target="_blank" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-brand-700 transition-all shadow-xl shadow-brand-600/30 hover:-translate-y-1">
+          <i class="ph-bold ph-shopping-cart"></i> Assinar Acesso (R$ 14,90)
+        </a>
+        <a href="https://wa.me/5571992756180" target="_blank" class="flex items-center justify-center gap-2 bg-white text-navy-800 border-2 border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-y-1">
+          <i class="ph-fill ph-whatsapp-logo text-green-500 text-2xl"></i> Dúvidas?
+        </a>
+      </div>
+
+      <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 text-left border-t border-slate-200 pt-16 w-full">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+          <div class="w-12 h-12 bg-navy-50 text-navy-700 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="ph-duotone ph-list-checks"></i></div>
+          <h3 class="font-bold text-navy-800 mb-2">Checklists em Prancheta</h3>
+          <p class="text-sm text-slate-500">Crie listas de verificação personalizadas, insira a sua logo e imprima o formulário perfeito em A4.</p>
+        </div>
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+          <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="ph-duotone ph-warning-octagon"></i></div>
+          <h3 class="font-bold text-navy-800 mb-2">Relatórios Oficiais</h3>
+          <p class="text-sm text-slate-500">Gere ROE (Ocorrências), RAA (Acompanhamento) e RPI (Prevenção) no padrão NBR.</p>
+        </div>
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+          <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="ph-duotone ph-whatsapp-logo"></i></div>
+          <h3 class="font-bold text-navy-800 mb-2">Automação WhatsApp</h3>
+          <p class="text-sm text-slate-500">Com um clique, os dados viram um relatório formatado com emojis e negrito para copiar e colar no grupo.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= TELA DE LOGIN ================= -->
+  <div id="view-login" class="absolute inset-0 z-50 bg-navy-900 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+      <svg class="w-20 h-20 mx-auto mb-6 drop-shadow-md"><use href="#brand-shield"></use></svg>
+      <h2 class="text-2xl font-black text-center text-navy-800 mb-2">Área Restrita</h2>
+      <p class="text-center text-sm text-slate-500 mb-8">Digite sua senha para acessar o painel operacional.</p>
+      
+      <form onsubmit="handleLogin(event)">
+        <label class="label-standard">Senha de Acesso</label>
+        <input type="password" id="loginPassword" class="input-standard mb-6 text-center text-xl tracking-widest" placeholder="••••••••" required />
+        
+        <button type="submit" class="w-full bg-brand-600 text-white font-bold rounded-xl py-4 hover:bg-brand-700 transition-colors shadow-lg shadow-brand-600/30">
+          Entrar no Sistema
+        </button>
+        <button type="button" onclick="showLanding()" class="w-full mt-3 bg-transparent text-slate-500 font-bold rounded-xl py-3 hover:bg-slate-50 transition-colors">
+          Voltar
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= APP PRINCIPAL ================= -->
+  <div id="view-app" class="flex-col h-full hidden w-full">
+    <!-- Header Fixo Topo -->
+    <header class="no-print bg-navy-800 text-white shadow-md z-40 shrink-0 border-b border-navy-700">
+      <div class="max-w-[1400px] mx-auto px-4 py-3 sm:px-6 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <svg class="w-10 h-10 drop-shadow-lg"><use href="#brand-shield"></use></svg>
+          <div>
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">Check<span class="text-brand-500">Fire</span> Pro</h1>
+            <p class="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-widest font-bold">Painel Operacional</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="triggerPrint()" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-lg font-bold text-sm hover:bg-brand-700 transition-all shadow-md active:scale-95">
+            <i class="ph-bold ph-printer text-lg"></i> <span class="hidden sm:inline">Imprimir / PDF</span>
+          </button>
+          <button type="button" onclick="saveLocal()" class="flex items-center justify-center p-2 sm:px-4 bg-navy-700 text-slate-200 rounded-lg hover:bg-navy-600 transition-all active:scale-95 border border-navy-600" title="Salvar Projeto">
+            <i class="ph-bold ph-floppy-disk text-lg"></i>
+          </button>
+          <button type="button" onclick="handleLogout()" class="flex items-center justify-center p-2 bg-navy-700 text-red-400 rounded-lg hover:bg-brand-600 hover:text-white transition-all ml-1 border border-navy-600" title="Sair do Sistema">
+            <i class="ph-bold ph-sign-out text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Área Principal Rolável -->
+    <main class="flex-1 overflow-y-auto app-main-container relative w-full no-print bg-slate-100">
+      <div class="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 w-full">
+        
+        <!-- ================= ABA 1: INSPEÇÃO / CHECKLIST ================= -->
+        <div id="tab-inspecao" class="tab-content active">
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8">
+            
+            <!-- Coluna 1: Cabeçalho do Formulário -->
+            <div class="xl:col-span-4 flex flex-col gap-6">
+              
+              <!-- Bloco: Configurações do Documento (A4) -->
+              <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-navy-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                  <i class="ph-duotone ph-file-dashed text-brand-600 text-xl"></i> Formato Oficial (Impressão)
+                </h2>
+                <div class="space-y-4">
+                  <div>
+                    <label class="label-standard">Logo do Relatório (Sua Empresa/Cliente)</label>
+                    <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-navy-50 file:text-navy-700 file:font-bold hover:file:bg-navy-100 cursor-pointer w-full mb-2" />
+                    <div class="h-16 border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 text-slate-400 text-xs logo-preview-container">
+                      Logo do Relatório
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-2">
+                    <div>
+                      <label for="codigo" class="label-standard">Código</label>
+                      <input id="codigo" class="input-standard !px-2 text-center" value="FR-001" oninput="renderPrint()" />
+                    </div>
+                    <div>
+                      <label for="versao" class="label-standard">Versão</label>
+                      <input id="versao" class="input-standard !px-2 text-center" value="Rev.00" oninput="renderPrint()" />
+                    </div>
+                    <div>
+                      <label for="periodicidade" class="label-standard">Período</label>
+                      <select id="periodicidade" class="input-standard !px-2" onchange="renderPrint()">
+                        <option>Mensal</option><option>Semanal</option><option>Anual</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bloco: Dados da Inspeção -->
+              <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200">
+                <h2 class="text-lg font-bold text-navy-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                  <i class="ph-duotone ph-buildings text-brand-600 text-xl"></i> Dados do Cliente
+                </h2>
+                <div class="space-y-4">
+                  <div>
+                    <label for="tituloRelatorio" class="label-standard">Título do Relatório</label>
+                    <input id="tituloRelatorio" class="input-standard" value="Auditoria de Sistemas de Combate a Incêndio" oninput="renderPrint()" />
+                  </div>
+                  <div>
+                    <label for="empresa" class="label-standard">Empresa / Cliente</label>
+                    <input id="empresa" class="input-standard" placeholder="Ex.: Condomínio Comercial..." oninput="renderPrint()" />
+                  </div>
+                  <div>
+                    <label for="endereco" class="label-standard">Endereço Completo</label>
+                    <input id="endereco" class="input-standard" placeholder="Rua, número, cidade/UF..." oninput="renderPrint()" />
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label for="setor" class="label-standard">Setor/Área</label>
+                      <input id="setor" class="input-standard" placeholder="Ex.: Bloco A" oninput="renderPrint()" />
+                    </div>
+                    <div>
+                      <label for="data" class="label-standard">Data</label>
+                      <input type="date" id="data" class="input-standard" oninput="renderPrint()" />
+                    </div>
+                  </div>
+                  <div>
+                    <label for="responsavel" class="label-standard">Inspetor(a) (Bombeiro Civil)</label>
+                    <input id="responsavel" class="input-standard" placeholder="Nome do responsável" oninput="renderPrint()" />
+                  </div>
+                  
+                  <div class="h-px bg-slate-200 my-4"></div>
+                  
+                  <div>
+                    <label for="manualTipo" class="label-standard">Adicionar Equipamento</label>
+                    <select id="manualTipo" class="input-standard mb-3 font-semibold text-navy-800">
+                      <option>Extintor</option><option>Hidrante</option><option>Porta de Emergência</option>
+                      <option>Iluminação de Emergência</option><option>Alarme de Incêndio</option>
+                      <option>Sinalização de Emergência</option><option>Sprinkler</option>
+                      <option>Bomba de Incêndio</option><option>Detector de Fumaça</option><option>Outro</option>
+                    </select>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                      <input id="manualPatrimonio" class="input-standard" placeholder="ID/Patrimônio" />
+                      <input id="manualLocal" class="input-standard" placeholder="Local" />
+                    </div>
+                    <button type="button" onclick="addEquipment()" class="w-full flex items-center justify-center gap-2 bg-navy-800 text-white px-4 py-3.5 rounded-xl font-bold text-sm hover:bg-navy-900 transition-all active:scale-[0.98] shadow-md">
+                      <i class="ph-bold ph-plus"></i> Inserir no Formulário
+                    </button>
+                  </div>
+
+                  <button type="button" onclick="resetAnswers()" class="w-full mt-2 flex items-center justify-center gap-2 bg-white text-slate-700 border-2 border-slate-200 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
+                    <i class="ph-bold ph-eraser text-lg text-slate-400"></i> Preparar para Prancheta (Limpar)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Coluna 2: Formulário Digital Gerado -->
+            <div class="xl:col-span-8">
+              <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 min-h-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-slate-100 pb-3">
+                  <h2 class="text-xl font-bold text-navy-800 flex items-center gap-2">
+                    <i class="ph-duotone ph-list-numbers text-brand-600"></i> Estrutura do Formulário
+                  </h2>
+                  <button type="button" onclick="addExtintorAreaExample()" class="text-xs bg-brand-50 text-brand-700 px-3 py-2 rounded-lg font-bold hover:bg-brand-100 border border-brand-200 transition-colors">
+                    <i class="ph-bold ph-magic-wand"></i> Inserir Exemplo
+                  </button>
+                </div>
+                <p class="text-xs text-slate-500 mb-6">Clique nos textos (pergunta, local) para editar in-line. Deixe as marcações (C/NC/NA) em branco caso vá imprimir a folha A4 e preencher à mão.</p>
+                
+                <div id="equipmentList" class="flex flex-col gap-5">
+                  <!-- Injetado via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= ABA 2: RELATÓRIOS (OCORRÊNCIA / ACOMPANHAMENTO) ================= -->
+        <div id="tab-relatorios" class="tab-content">
+          <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200">
+              <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-5">
+                <div class="w-14 h-14 rounded-2xl bg-navy-50 text-navy-700 flex items-center justify-center text-3xl border border-navy-100">
+                  <i class="ph-duotone ph-files"></i>
+                </div>
+                <div>
+                  <h2 class="text-2xl font-bold text-navy-800">Relatórios Operacionais</h2>
+                  <p class="text-sm text-slate-500 mt-1">Gere relatórios oficias no padrão NBR.</p>
+                </div>
+              </div>
+
+              <div class="space-y-6">
+                <!-- LOGO UPLOAD PARA RELATÓRIOS -->
+                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                  <label class="label-standard">Logo do Relatório (Sua Empresa/Cliente)</label>
+                  <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-navy-100 file:text-navy-700 file:font-bold hover:file:bg-navy-200 cursor-pointer w-full mb-2" />
+                  <div class="h-16 border border-slate-300 rounded-xl flex items-center justify-center overflow-hidden bg-white text-slate-400 text-xs logo-preview-container">
+                    Logo do Relatório
+                  </div>
+                </div>
+
+                <!-- SELETOR PRINCIPAL DO TIPO DE RELATÓRIO (SEGMENT CONTROL) -->
+                <div class="mb-6">
+                  <label class="label-standard text-navy-800 mb-3 text-center sm:text-left"><i class="ph-bold ph-tag"></i> Tipo de Relatório a ser gerado</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label class="segment-radio">
+                      <input type="radio" name="rel_categoria" value="RAA" checked onchange="renderPrint()">
+                      <div class="segment-label">
+                        <i class="ph-duotone ph-clipboard-text text-xl mb-1"></i>
+                        Acompanhamento (RAA)
+                      </div>
+                    </label>
+                    <label class="segment-radio">
+                      <input type="radio" name="rel_categoria" value="ROE" onchange="renderPrint()">
+                      <div class="segment-label">
+                        <i class="ph-duotone ph-warning-octagon text-xl mb-1"></i>
+                        Ocorrência (ROE)
+                      </div>
+                    </label>
+                    <label class="segment-radio">
+                      <input type="radio" name="rel_categoria" value="RPI" onchange="renderPrint()">
+                      <div class="segment-label">
+                        <i class="ph-duotone ph-shield-check text-xl mb-1"></i>
+                        Prevenção (RPI)
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label class="label-standard">Natureza / Atividade</label>
+                    <input id="occ_tipo" class="input-standard" placeholder="Ex: Liberação de PT, Princípio de Incêndio..." oninput="renderPrint()" />
+                  </div>
+                  <div>
+                    <label class="label-standard">Solicitante / Setor Acompanhado</label>
+                    <input id="occ_solicitante" class="input-standard" placeholder="Ex: Manutenção Elétrica..." oninput="renderPrint()" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                  <div class="col-span-2 sm:col-span-1">
+                    <label class="label-standard">Data</label>
+                    <input type="date" id="occ_data" class="input-standard" oninput="renderPrint()" />
+                  </div>
+                  <div class="col-span-1">
+                    <label class="label-standard">Hora Início</label>
+                    <input type="time" id="occ_hora_inicio" class="input-standard" oninput="renderPrint()" />
+                  </div>
+                  <div class="col-span-1">
+                    <label class="label-standard">Chegada</label>
+                    <input type="time" id="occ_hora_chegada" class="input-standard" oninput="renderPrint()" />
+                  </div>
+                  <div class="col-span-1">
+                    <label class="label-standard">Hora Fim</label>
+                    <input type="time" id="occ_hora_fim" class="input-standard" oninput="renderPrint()" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="label-standard">Local Exato da Atividade / Ocorrência</label>
+                  <input id="occ_local" class="input-standard" placeholder="Ex: Galpão 3, Máquina de Solda B" oninput="renderPrint()" />
+                </div>
+
+                <div>
+                  <label class="label-standard">1. Histórico e Relato do Fato</label>
+                  <textarea id="occ_historico" class="input-standard min-h-[100px]" placeholder="Descreva a situação inicial, como a equipe encontrou a cena ou os detalhes da atividade..." oninput="renderPrint()"></textarea>
+                </div>
+
+                <div>
+                  <label class="label-standard">2. Ações de Prevenção / Intervenção Realizadas</label>
+                  <textarea id="occ_acoes" class="input-standard min-h-[100px]" placeholder="Quais procedimentos adotados? (Ex: Isolamento, uso de extintores, inspeção prévia...)" oninput="renderPrint()"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label class="label-standard">Materiais Utilizados</label>
+                    <textarea id="occ_materiais" class="input-standard min-h-[90px]" placeholder="Ex: Fita zebrada, Rádio, Extintor..." oninput="renderPrint()"></textarea>
+                  </div>
+                  <div>
+                    <label class="label-standard">Houve Vítimas / Acidentes?</label>
+                    <select id="occ_vitimas" class="input-standard mb-3" onchange="renderPrint()">
+                      <option value="NÃO">Não / N/A</option>
+                      <option value="SIM">Sim, com vítimas</option>
+                    </select>
+                    <input id="occ_vitimas_desc" class="input-standard" placeholder="Se sim, descreva o estado/destino." oninput="renderPrint()" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="label-standard">Conclusão / Situação Final</label>
+                  <input id="occ_conclusao" class="input-standard" placeholder="Ex: Atividade concluída sem alterações. Local seguro." oninput="renderPrint()" />
+                </div>
+
+                <div>
+                  <label class="label-standard">Equipe Empreendida (Bombeiros/Brigadistas)</label>
+                  <input id="occ_equipe" class="input-standard" placeholder="Nomes dos profissionais..." oninput="renderPrint()" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= ABA 3: EXPORTAR WHATSAPP ================= -->
+        <div id="tab-whatsapp" class="tab-content">
+          <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
+              <div class="text-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-3xl mx-auto mb-3">
+                  <i class="ph-fill ph-whatsapp-logo"></i>
+                </div>
+                <h2 class="text-xl font-bold text-navy-800">Exportar para WhatsApp</h2>
+                <p class="text-sm text-slate-500">Gere um texto formatado pronto para enviar no grupo operacional.</p>
+              </div>
+
+              <!-- Escolha do que exportar no WhatsApp -->
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6">
+                <label class="label-standard text-center mb-3">O que você deseja compartilhar?</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="segment-radio">
+                    <input type="radio" name="wp_type" value="REL" checked onchange="generateWhatsAppReport()">
+                    <div class="segment-label !py-2"><i class="ph-duotone ph-file-text text-lg"></i> Relatório <br><span class="text-[9px] font-normal">(Aba Relatórios)</span></div>
+                  </label>
+                  <label class="segment-radio">
+                    <input type="radio" name="wp_type" value="CHK" onchange="generateWhatsAppReport()">
+                    <div class="segment-label !py-2"><i class="ph-duotone ph-list-checks text-lg"></i> Resumo Inspeção <br><span class="text-[9px] font-normal">(Aba Inspeção)</span></div>
+                  </label>
+                </div>
+              </div>
+
+              <textarea id="whatsappOutput" class="w-full border-2 border-slate-200 rounded-xl px-4 py-4 text-sm text-slate-800 bg-white focus:outline-none focus:border-green-500 min-h-[350px] font-mono leading-relaxed resize-y shadow-inner"></textarea>
+
+              <button type="button" onclick="copyWhatsAppText()" class="w-full mt-4 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-4 rounded-xl font-bold text-base hover:bg-green-700 transition-all shadow-lg shadow-green-600/30 active:scale-[0.98]">
+                <i class="ph-bold ph-copy text-xl"></i> Copiar Texto
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= PRÉ-VISUALIZAÇÃO A4 (Sempre Visível) ================= -->
+        <div class="no-print mt-10 pb-8" id="printPreviewContainer">
+          <div class="flex items-center justify-between mb-4 border-t border-slate-300 pt-6">
+             <div class="flex items-center gap-2 text-navy-800 font-black text-sm uppercase tracking-wider">
+               <i class="ph-bold ph-printer text-xl"></i> Pré-visualização do Documento (A4)
+             </div>
+          </div>
+          <!-- A div abaixo permite scroll horizontal no celular sem quebrar o layout da A4 -->
+          <div class="overflow-x-auto pb-4 custom-scrollbar">
+            <div class="print-page shadow-xl border border-slate-300 mx-auto" id="printPage" style="transform-origin: top left; min-width: 210mm;">
+              <!-- O conteúdo da folha é injetado aqui -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Navigation Bar Inferior (Estilo App) -->
+    <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 z-50 px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.03)] no-print">
+      <div class="max-w-[1400px] mx-auto h-[72px] sm:h-20 flex justify-around items-center">
+        <button class="nav-item active" onclick="switchTab('tab-inspecao', this)">
+          <i class="ph-fill ph-clipboard-text text-[26px] sm:text-3xl mb-0.5"></i>
+          <span class="text-[10px] sm:text-xs font-semibold tracking-wide">Inspeção</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-relatorios', this)">
+          <i class="ph-fill ph-files text-[26px] sm:text-3xl mb-0.5"></i>
+          <span class="text-[10px] sm:text-xs font-semibold tracking-wide">Relatórios</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-whatsapp', this)">
+          <i class="ph-fill ph-whatsapp-logo text-[26px] sm:text-3xl mb-0.5"></i>
+          <span class="text-[10px] sm:text-xs font-semibold tracking-wide">WhatsApp</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    "use strict";
+
+    // ====== AUTHENTICATION ======
+    const SYSTEM_PASSWORD = "checkfire123";
+
+    function checkAuth() {
+      const isAuth = localStorage.getItem('cf_auth') === 'true';
+      if (isAuth) { showApp(); } else { showLanding(); }
+    }
+
+    function showLanding() {
+      document.getElementById('view-landing').classList.remove('hidden');
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-app').classList.add('hidden');
+      document.getElementById('view-app').classList.remove('flex');
+    }
+
+    function showLogin() {
+      document.getElementById('view-landing').classList.add('hidden');
+      document.getElementById('view-login').classList.remove('hidden');
+      document.getElementById('loginPassword').value = '';
+      setTimeout(() => document.getElementById('loginPassword').focus(), 100);
+    }
+
+    function showApp() {
+      document.getElementById('view-landing').classList.add('hidden');
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-app').classList.remove('hidden');
+      document.getElementById('view-app').classList.add('flex');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const pwd = document.getElementById('loginPassword').value;
+      if (pwd === SYSTEM_PASSWORD) {
+        localStorage.setItem('cf_auth', 'true');
+        showApp(); showToast("Login realizado com sucesso!");
+      } else { showToast("Senha incorreta. Tente novamente.", "error"); }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('cf_auth'); showLanding(); showToast("Você saiu do sistema.", "info");
+    }
+
+    // ====== ESTADOS ======
+    const STATUS = { CONFORME: "Conforme", NAO_CONFORME: "Nao conforme", NAO_APLICA: "Nao se aplica" };
+    let currentTabId = 'tab-inspecao';
+
+    const iconMap = {
+      "Extintor": "ph-fire-extinguisher", "Hidrante": "ph-drop", "Porta de Emergência": "ph-door",
+      "Iluminação de Emergência": "ph-lightbulb", "Alarme de Incêndio": "ph-bell-ringing",
+      "Sinalização de Emergência": "ph-warning-octagon", "Sprinkler": "ph-shower",
+      "Bomba de Incêndio": "ph-engine", "Detector de Fumaça": "ph-wind", "Outro": "ph-cube"
+    };
+
+    const templates = {
+      "Extintor": ["Sinalização visível", "Acesso livre e desobstruído", "Lacre e pino íntegros", "Manômetro na faixa verde", "Mangueira/gatilho em bom estado", "Carga na validade", "Teste hidrostático na validade", "Suporte em bom estado", "Identificação legível"],
+      "Hidrante": ["Abrigo identificado", "Acesso livre e desobstruído", "Mangueiras secas e acondicionadas", "Esguicho, chave e adaptadores presentes", "Registro sem vazamentos", "Vidro da porta íntegro"],
+      "Porta de Emergência": ["Abertura no sentido da fuga", "Barra antipânico operante", "Porta sem trancas/obstáculos", "Sinalização de saída visível", "Fechamento automático (mola) operante"],
+      "Iluminação de Emergência": ["Fixado corretamente", "Lâmpadas/LEDs funcionando", "Bateria com autonomia satisfatória", "Cabo de alimentação em bom estado"],
+      "Outro": ["Item identificado", "Acesso livre e sinalização", "Condição estrutural satisfatória", "Funcionamento verificado"]
+    };
+
+    let logoData = "";
+    let equipment = [];
+
+    // ====== UTILITÁRIOS ======
+    function getValue(id) { const el = document.getElementById(id); return el ? el.value || "" : ""; }
+    function getRadioValue(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ""; }
+    function setValue(id, value) { const el = document.getElementById(id); if (el) el.value = value; }
+    function setRadioValue(name, value) { const el = document.querySelector(`input[name="${name}"][value="${value}"]`); if(el) el.checked = true; }
+    function escapeHTML(value) { return String(value == null ? "" : value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;").replace(/'/g, "&#039;"); }
+    function formatDateBR(value) { if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return ""; const p = value.split("-"); return `${p[2]}/${p[1]}/${p[0]}`; }
+    function makeId() { return crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now(); }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const icon = type === 'success' ? '<i class="ph-fill ph-check-circle text-green-400 text-2xl"></i>' : type === 'error' ? '<i class="ph-fill ph-x-circle text-brand-500 text-2xl"></i>' : '<i class="ph-fill ph-info text-blue-400 text-2xl"></i>';
+      toast.className = 'toast';
+      toast.innerHTML = `${icon} <span>${escapeHTML(message)}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    // ====== LOAD LOGO ======
+    function loadLogo(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        logoData = e.target.result;
+        document.querySelectorAll(".logo-preview-container").forEach(el => {
+          el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-12 object-contain" />`;
+        });
+        renderPrint();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ====== NAVEGAÇÃO ======
+    function switchTab(tabId, btnElement) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btnElement.classList.add('active');
+      currentTabId = tabId;
+      if(tabId === 'tab-whatsapp') generateWhatsAppReport();
+      renderPrint();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ====== INSPEÇÃO (CHECKLIST) ======
+    function makeCheckObjects(checks) { return checks.map(text => ({ text: String(text), status: "", obs: "" })); }
+    function normalizeChecks(item) {
+      if (!item) item = {};
+      if (!Array.isArray(item.checks)) item.checks = [];
+      if (item.checks.length > 0 && typeof item.checks[0] === "string") item.checks = makeCheckObjects(item.checks);
+      item.checks = item.checks.map(check => {
+        if (typeof check === "string") return { text: check, status: "", obs: "" };
+        return { text: String(check.text || ""), status: String(check.status || ""), obs: String(check.obs || "") };
+      });
+      item.id = item.id || makeId(); item.tipo = item.tipo || "Outro"; item.patrimonio = item.patrimonio || "S/C";
+      item.local = item.local || ""; item.descricao = item.descricao || item.tipo; item.geralObs = item.geralObs || "";
+      return item;
+    }
+
+    function addEquipment() {
+      const tipo = getValue("manualTipo") || "Outro";
+      equipment.push(normalizeChecks({
+        id: makeId(), tipo, patrimonio: getValue("manualPatrimonio") || "S/C",
+        local: getValue("manualLocal") || "Não informado", descricao: tipo,
+        checks: templates[tipo] || templates.Outro, geralObs: ""
+      }));
+      setValue("manualPatrimonio", ""); setValue("manualLocal", "");
+      showToast("Equipamento adicionado!"); renderList(); renderPrint();
+    }
+
+    function removeEquipment(id) { equipment = equipment.filter(item => item.id !== id); renderList(); renderPrint(); }
+    function updateEquipmentField(id, field, value) { const item = equipment.find(x => x.id === id); if (item) { item[field] = value; renderPrint(); } }
+    function updateCheckText(id, checkIndex, text) { const item = equipment.find(x => x.id === id); if (item && item.checks[checkIndex]) { item.checks[checkIndex].text = text; renderPrint(); } }
+    function updateCheckStatus(id, checkIndex, status) {
+      const item = equipment.find(x => x.id === id); if (!item) return;
+      item.checks[checkIndex].status = (item.checks[checkIndex].status === status) ? "" : status;
+      renderList(); renderPrint();
+    }
+    function updateCheckObs(id, checkIndex, obs) { const item = equipment.find(x => x.id === id); if (item && item.checks[checkIndex]) { item.checks[checkIndex].obs = obs; renderPrint(); } }
+    function resetAnswers() {
+      if(confirm("Apagar marcações C/NC/NA de todos os itens? O formulário ficará em branco e pronto para imprimir.")) {
+        equipment.forEach(item => { item.checks.forEach(check => { check.status = ""; check.obs = ""; }); item.geralObs = ""; });
+        renderList(); renderPrint(); showToast("Formulário pronto para prancheta.");
+      }
+    }
+    function addExtintorAreaExample() {
+      const locais = ["Recepção", "Corredor A"];
+      for (let i = 1; i <= 2; i++) {
+        equipment.push(normalizeChecks({ id: makeId(), tipo: "Extintor", patrimonio: `EXT-0${i}`, local: locais[i-1], descricao: i%2===0?"CO2 6Kg":"PQS 6Kg", checks: templates.Extintor }));
+      }
+      if (!getValue("setor")) setValue("setor", "Área Operacional");
+      renderList(); renderPrint(); showToast("Itens de exemplo gerados.");
+    }
+
+    function renderList() {
+      const el = document.getElementById("equipmentList");
+      if (!el) return;
+      equipment = equipment.map(normalizeChecks);
+
+      if (!equipment.length) {
+        el.innerHTML = `<div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 text-center flex flex-col items-center">
+            <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-3xl mb-3"><i class="ph-duotone ph-clipboard-text"></i></div>
+            <h3 class="text-base font-bold text-slate-700">Checklist Vazio</h3>
+            <p class="text-slate-500 text-xs mt-1">Adicione itens no painel ao lado.</p>
+          </div>`;
+        return;
+      }
+
+      el.innerHTML = equipment.map((item, itemIndex) => {
+        const iconClass = iconMap[item.tipo] || iconMap["Outro"];
+        const checksHtml = item.checks.map((check, checkIndex) => {
+          const isC = check.status === STATUS.CONFORME, isNC = check.status === STATUS.NAO_CONFORME, isNA = check.status === STATUS.NAO_APLICA;
+          return `
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 p-3 items-start sm:items-center border-b border-slate-100 hover:bg-slate-50 transition-colors">
+              <div class="flex-1 w-full flex items-start sm:items-center gap-2">
+                <span class="text-slate-400 font-bold text-xs mt-1 sm:mt-0 w-4">${checkIndex + 1}.</span> 
+                <input type="text" value="${escapeHTML(check.text)}" class="inline-edit text-xs sm:text-sm font-medium text-navy-800 py-1" onchange="updateCheckText('${item.id}', ${checkIndex}, this.value)" title="Editar pergunta">
+              </div>
+              <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
+                <div class="flex p-1 bg-slate-100 rounded-lg shrink-0 gap-1 shadow-inner">
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="w-10 h-8 rounded text-xs font-bold transition-all ${isC ? 'bg-green-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">C</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="w-10 h-8 rounded text-xs font-bold transition-all ${isNC ? 'bg-brand-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NC</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="w-10 h-8 rounded text-xs font-bold transition-all ${isNA ? 'bg-slate-400 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NA</button>
+                </div>
+                <input type="text" class="flex-1 sm:w-32 border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:border-brand-500 outline-none placeholder-slate-400" placeholder="Obs..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
+              </div>
+            </div>`;
+        }).join("");
+
+        return `
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-brand-200 transition-colors">
+            <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4">
+              <div class="flex items-center gap-3 w-full">
+                <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center text-brand-600 text-2xl border border-navy-100 shrink-0"><i class="ph-duotone ${iconClass}"></i></div>
+                <div class="w-full flex-1 min-w-0">
+                  <div class="flex items-center gap-1 mb-0.5 w-full">
+                    <input type="text" value="${escapeHTML(item.tipo)}" class="inline-edit font-black text-navy-800 text-sm sm:text-base truncate max-w-[120px] sm:max-w-[200px]" onchange="updateEquipmentField('${item.id}', 'tipo', this.value)">
+                    <div class="flex items-center bg-brand-50 text-brand-700 rounded-md px-1.5 py-0.5 shrink-0 border border-brand-100">
+                       <i class="ph-bold ph-barcode text-[10px] mr-1"></i>
+                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-[10px] sm:text-xs font-bold w-12 sm:w-16 outline-none" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
+                    </div>
+                  </div>
+                  <div class="flex items-center text-xs text-slate-500 w-full truncate">
+                    <i class="ph-fill ph-map-pin mr-1 text-slate-400"></i><input type="text" value="${escapeHTML(item.local)}" class="inline-edit flex-1 px-1 min-w-0 truncate" onchange="updateEquipmentField('${item.id}', 'local', this.value)">
+                  </div>
+                </div>
+              </div>
+              <button type="button" onclick="removeEquipment('${item.id}')" class="text-slate-400 hover:text-brand-600 bg-slate-50 p-2 rounded-lg ml-auto sm:ml-0 shrink-0"><i class="ph-bold ph-trash text-lg"></i></button>
+            </div>
+            <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
+              <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Verificações</div>
+              <div class="divide-y divide-slate-100">${checksHtml}</div>
+            </div>
+          </div>`;
+      }).join("");
+    }
+
+    // ====== WHATSAPP LOGIC ======
+    function generateWhatsAppReport() {
+      const wpType = getRadioValue("wp_type") || "REL";
+      let text = "";
+
+      if (wpType === "REL") {
+        const catVal = getRadioValue("rel_categoria");
+        let headerEmoji = "📋", headerTitle = "ACOMPANHAMENTO DE ATIVIDADE";
+        if(catVal === "ROE") { headerEmoji = "🚨"; headerTitle = "RELATÓRIO DE OCORRÊNCIA"; } 
+        else if (catVal === "RPI") { headerEmoji = "🛡️"; headerTitle = "RELATÓRIO DE PREVENÇÃO"; }
+
+        const tipo = getValue("occ_tipo") || "Não informado";
+        const data = formatDateBR(getValue("occ_data")) || "[Data]";
+        const hIni = getValue("occ_hora_inicio") || "--:--", hCheg = getValue("occ_hora_chegada") || "--:--", hFim = getValue("occ_hora_fim") || "--:--";
+        const local = getValue("occ_local") || "Não informado", sol = getValue("occ_solicitante") || "Não informado";
+        const hist = getValue("occ_historico") || "Nenhum relato.", acoes = getValue("occ_acoes") || "Nenhuma ação.";
+        const mat = getValue("occ_materiais") || "Nenhum material.", vit = getValue("occ_vitimas") === "SIM" ? "Sim - " + getValue("occ_vitimas_desc") : "Sem vítimas";
+        const conc = getValue("occ_conclusao") || "Nenhuma conclusão.", eqp = getValue("occ_equipe") || getValue("responsavel") || "Não informada";
+
+        text = `*${headerEmoji} ${headerTitle}*
+*Natureza:* ${tipo}
+*Data:* ${data}
+*Local:* ${local}
+
+*⏰ HORÁRIOS:*
+• Início: ${hIni}
+• Chegada: ${hCheg}
+• Término: ${hFim}
+• Solicitante: ${sol}
+
+*📌 HISTÓRICO:*
+${hist}
+
+*✅ AÇÕES REALIZADAS:*
+${acoes}
+
+*🚑 VÍTIMAS / ACIDENTES:*
+${vit}
+
+*🧯 MATERIAIS UTILIZADOS:*
+${mat}
+
+*🏁 SITUAÇÃO FINAL:*
+${conc}
+
+*👨‍🚒 EQUIPE:*
+${eqp}`;
+
+      } else {
+        // Resumo de Checklist
+        const emp = getValue("empresa") || "Empresa não inf.";
+        const data = formatDateBR(getValue("data")) || "[Data]";
+        const resp = getValue("responsavel") || "Inspetor não inf.";
+        
+        let totalC = 0, totalNC = 0, totalNA = 0;
+        let ncList = [];
+
+        equipment.forEach(item => {
+          item.checks.forEach(c => {
+            if(c.status === STATUS.CONFORME) totalC++;
+            else if(c.status === STATUS.NAO_CONFORME) {
+              totalNC++;
+              ncList.push(`- ${item.tipo} (${item.patrimonio}) - ${item.local}:\n  ⚠️ ${c.text} ${c.obs ? '('+c.obs+')' : ''}`);
+            }
+            else if(c.status === STATUS.NAO_APLICA) totalNA++;
+          });
+        });
+
+        text = `*📋 RESUMO DE INSPEÇÃO SCI*
+*Cliente:* ${emp}
+*Data:* ${data}
+*Inspetor:* ${resp}
+*Equipamentos verificados:* ${equipment.length} un.
+
+*📊 RESULTADOS:*
+✅ Conformes: ${totalC}
+❌ Não Conformes: ${totalNC}
+➖ Não Aplicáveis: ${totalNA}
+
+`;
+        if (totalNC > 0) {
+          text += `*⚠️ PONTOS DE ATENÇÃO (NÃO CONFORMES):*\n${ncList.join("\n\n")}\n\n`;
+        } else if (equipment.length > 0) {
+           text += `*✨ Nenhuma Não Conformidade encontrada nos itens avaliados.*\n\n`;
+        } else {
+           text += `(Nenhum equipamento adicionado ao checklist ainda)\n\n`;
+        }
+        text += `_Relatório gerado via CheckFire Pro_`;
+      }
+
+      document.getElementById("whatsappOutput").value = text;
+    }
+
+    function copyWhatsAppText() {
+      const text = document.getElementById("whatsappOutput").value;
+      if (!text) return showToast("Relatório vazio.", "error");
+      const textarea = document.createElement("textarea");
+      textarea.value = text; textarea.style.position = "fixed"; textarea.style.opacity = "0";
+      document.body.appendChild(textarea); textarea.select();
+      try { document.execCommand("copy"); showToast("Relatório copiado!"); } 
+      catch (err) { showToast("Erro ao copiar.", "error"); } 
+      finally { document.body.removeChild(textarea); }
+    }
+
+    // ====== IMPRESSÃO ======
+    function mark(status, expected) { return status === expected ? "X" : ""; }
+
+    function renderPrint() {
+      const printPage = document.getElementById("printPage");
+      if (!printPage) return;
+      
+      const logoHTML = logoData ? `<img src="${logoData}" alt="Logo" />` : 'LOGO DA<br>EMPRESA';
+      const codigoDoc = escapeHTML(getValue("codigo")) || "FR-001";
+      const versaoDoc = escapeHTML(getValue("versao")) || "Rev.00";
+      const periodoDoc = escapeHTML(getValue("periodicidade")) || "Mensal";
+
+      if (currentTabId === 'tab-inspecao' || (currentTabId === 'tab-whatsapp' && getRadioValue('wp_type') === 'CHK')) {
+        const tit = getValue("tituloRelatorio") || "Auditoria de Sistemas de Combate a Incêndio";
+        const emp = getValue("empresa") || '-';
+        const grouped = equipment.reduce((acc, item) => { acc[item.tipo] = acc[item.tipo] || []; acc[item.tipo].push(item); return acc; }, {});
+        
+        let blocks = Object.keys(grouped).map(tipo => {
+          const items = grouped[tipo];
+          if (items.length >= 6 && items[0].checks.length > 0) {
+            const checksTexts = items[0].checks.map(c => c.text);
+            const headers = checksTexts.map(ct => `<th class="vertical-th col-check"><span>${escapeHTML(ct.substring(0,40))}</span></th>`).join("");
+            const rows = items.map(item => {
+              const cells = checksTexts.map(cName => {
+                const f = item.checks.find(c => c.text === cName);
+                return `<td class="mark">${f&&f.status ? (f.status===STATUS.CONFORME?'C':f.status===STATUS.NAO_CONFORME?'NC':'NA') : ''}</td>`;
+              }).join("");
+              const obs = item.checks.filter(c=>c.obs).map(c=>c.obs).join(" | ") || item.geralObs;
+              return `<tr><td class="mark" style="font-size:7px">${escapeHTML(item.patrimonio)}</td><td style="font-weight:bold; font-size:7px">${escapeHTML(item.local)}</td><td style="font-size:7px">${escapeHTML(item.descricao)}</td>${cells}<td>${escapeHTML(obs)}</td></tr>`;
+            }).join("");
+            return `<div class="equipment-print-block"><div style="background:#f1f5f9; padding:5px; border-bottom:1px solid #000; font-size:8.5px; font-weight:bold; text-transform:uppercase;">Relatório de Área Massiva (${items.length} unidades do tipo ${tipo})</div><table class="subcheck-table compact-ext-table"><thead><tr><th class="vertical-th col-num"><span>Patrimônio</span></th><th class="vertical-th col-local"><span>Localização</span></th><th class="vertical-th col-desc"><span>Descrição</span></th>${headers}<th class="vertical-th col-obs"><span>Observações</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+          }
+          
+          return items.map((item, index) => {
+            const rows = item.checks.map((c, i) => `<tr><td class="mark">${i+1}</td><td style="font-size:7.5px;">${escapeHTML(c.text)}</td><td class="mark">${mark(c.status, STATUS.CONFORME)}</td><td class="mark">${mark(c.status, STATUS.NAO_CONFORME)}</td><td class="mark">${mark(c.status, STATUS.NAO_APLICA)}</td><td>${escapeHTML(c.obs)}</td></tr>`).join("");
+            return `<div class="equipment-print-block"><div class="equipment-print-title"><div>Nº<br>${index+1}</div><div>Equipamento<br>${escapeHTML(item.tipo)}</div><div>Patrimônio/Id<br>${escapeHTML(item.patrimonio)}</div><div>Localização<br>${escapeHTML(item.local)}</div><div>Descrição<br>${escapeHTML(item.descricao)}</div></div><table class="subcheck-table"><thead><tr><th style="width:6mm;text-align:center;">Item</th><th>Verificação Solicitada</th><th style="width:8mm;text-align:center;">C</th><th style="width:8mm;text-align:center;">NC</th><th style="width:8mm;text-align:center;">NA</th><th style="width:50mm;">Observações (Prancheta)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+          }).join("");
+        }).join("");
+
+        printPage.innerHTML = `
+          <div class="print-header">
+            <div class="print-logo">${logoHTML}</div>
+            <div class="print-title"><h2>${escapeHTML(tit)}</h2><p>Formulário de Inspeção SCI</p></div>
+            <div class="print-code"><div><strong>Código:</strong> ${codigoDoc}</div><div><strong>Versão:</strong> ${versaoDoc}</div><div><strong>Período:</strong> ${periodoDoc}</div><div><strong>Página:</strong> 1/1</div></div>
+          </div>
+          <div class="print-info">
+            <div><strong>Cliente / Empresa</strong>${escapeHTML(emp)}</div>
+            <div><strong>Endereço</strong>${escapeHTML(getValue("endereco")) || '-'}</div>
+            <div><strong>Local / Setor</strong>${escapeHTML(getValue("setor")) || '-'}</div>
+            <div><strong>Data / Inspetor</strong>${formatDateBR(getValue("data")) || '___/___/_____'} - ${escapeHTML(getValue("responsavel")) || '-'}</div>
+          </div>
+          <div class="legend"><strong>Legenda:</strong> <span>C = Conforme</span> <span>NC = Não Conforme</span> <span>NA = Não se aplica</span> <span style="margin-left:auto; font-style:italic;">(Itens relacionados: ${equipment.length})</span></div>
+          ${blocks || '<div style="border:1px solid #000; padding:20mm; text-align:center; font-size:10px;">Adicione equipamentos na plataforma.</div>'}
+          <div class="signature-area"><div class="signature-line"><strong>${escapeHTML(getValue("responsavel")) || 'Nome do Inspetor'}</strong><br><span style="font-weight:normal; font-size:8px;">Assinatura</span></div><div class="signature-line"><strong>${escapeHTML(emp) || 'Cliente'}</strong><br><span style="font-weight:normal; font-size:8px;">Ciente</span></div></div>`;
+      
+      } else {
+        const catVal = getRadioValue("rel_categoria") || "RAA";
+        let headerTitle = "ACOMPANHAMENTO DE ATIVIDADE (RAA)", headerSub = "Registro de Atendimento e Prevenção";
+        if (catVal === "ROE") { headerTitle = "RELATÓRIO DE OCORRÊNCIA (ROE)"; headerSub = "Registro de Atendimento Emergencial"; } 
+        else if (catVal === "RPI") { headerTitle = "RELATÓRIO DE PREVENÇÃO E INSPEÇÃO"; headerSub = "Registro de Conformidade e Ações Preventivas"; }
+
+        printPage.innerHTML = `
+          <div class="print-header">
+            <div class="print-logo">${logoHTML}</div>
+            <div class="print-title"><h2>${headerTitle}</h2><p>${headerSub}</p></div>
+            <div class="print-code"><div><strong>Código:</strong> ${codigoDoc}</div><div><strong>Versão:</strong> ${versaoDoc}</div><div><strong>Período:</strong> Sob demanda</div><div><strong>Página:</strong> 1/1</div></div>
+          </div>
+          <div class="occ-section-title">Dados Gerais e Acionamento</div>
+          <div class="print-info-occ" style="border-bottom:0;">
+            <div><strong>Natureza / Serviço</strong>${escapeHTML(getValue("occ_tipo")) || '-'}</div>
+            <div><strong>Solicitante / Setor</strong>${escapeHTML(getValue("occ_solicitante")) || '-'}</div>
+            <div><strong>Localização Exata</strong>${escapeHTML(getValue("occ_local")) || '-'}</div>
+          </div>
+          <div class="print-info-occ">
+            <div><strong>Data / Empresa</strong>${formatDateBR(getValue("occ_data")) || '___/___/_____'} - ${escapeHTML(getValue("empresa")) || '-'}</div>
+            <div><strong>Horários (Início / Chegada)</strong>${escapeHTML(getValue("occ_hora_inicio"))||'--:--'} / ${escapeHTML(getValue("occ_hora_chegada"))||'--:--'}</div>
+            <div><strong>Horário Término</strong>${escapeHTML(getValue("occ_hora_fim")) || '--:--'}</div>
+          </div>
+          
+          <div style="margin-top: 8px;">
+            <div class="occ-section-title">1. Histórico e Relato do Fato</div>
+            <div class="occ-textarea-box">${escapeHTML(getValue("occ_historico")) || '\n\n\n'}</div>
+          </div>
+          <div style="margin-top: 8px;">
+            <div class="occ-section-title">2. Ações de Intervenção / Prevenção Realizadas</div>
+            <div class="occ-textarea-box">${escapeHTML(getValue("occ_acoes")) || '\n\n\n'}</div>
+          </div>
+          <div style="margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+            <div><div class="occ-section-title">Materiais Utilizados</div><div class="occ-textarea-box" style="min-height: 15mm; border-bottom:1px solid #000;">${escapeHTML(getValue("occ_materiais")) || '\n\n'}</div></div>
+            <div><div class="occ-section-title">Vítimas / Acidentes?</div><div class="occ-textarea-box" style="min-height: 15mm; border-bottom:1px solid #000;">${getValue("occ_vitimas") === "SIM" ? 'SIM - ' + escapeHTML(getValue("occ_vitimas_desc")) : 'NÃO HOUVE VÍTIMAS'}</div></div>
+          </div>
+          <div style="margin-top: 8px;">
+            <div class="occ-section-title">Situação Final / Conclusão</div>
+            <div class="occ-textarea-box" style="min-height: 12mm; border-bottom:1px solid #000;">${escapeHTML(getValue("occ_conclusao")) || ''}</div>
+          </div>
+          <div style="margin-top: 8px;">
+            <div class="occ-section-title">Equipe Empreendida</div>
+            <div class="occ-textarea-box" style="min-height: 12mm; border-bottom:1px solid #000;">${escapeHTML(getValue("occ_equipe")) || ''}</div>
+          </div>
+          
+          <div class="signature-area" style="margin-top: 20mm;">
+            <div class="signature-line"><strong>${escapeHTML(getValue("occ_equipe").split(',')[0]) || 'Líder da Equipe'}</strong><br><span style="font-weight:normal; font-size:8px;">Bombeiro Civil / Brigadista</span></div>
+            <div class="signature-line"><strong>${escapeHTML(getValue("empresa")) || 'Representante do Local'}</strong><br><span style="font-weight:normal; font-size:8px;">Ciente</span></div>
+          </div>`;
+      }
+    }
+
+    function triggerPrint() { renderPrint(); try { window.print(); } catch(e) { showToast("Use Ctrl+P (ou Cmd+P) para imprimir.", "info"); } }
+
+    // ====== DB LOCAL E INIT ======
+    function saveLocal() {
+      const payload = { logoData, equipment, rel_categoria: getRadioValue("rel_categoria") };
+      const fields = ["tituloRelatorio", "empresa", "endereco", "setor", "data", "responsavel", "codigo", "versao", "periodicidade", "occ_tipo", "occ_solicitante", "occ_data", "occ_hora_inicio", "occ_hora_chegada", "occ_hora_fim", "occ_local", "occ_historico", "occ_acoes", "occ_materiais", "occ_vitimas", "occ_vitimas_desc", "occ_conclusao", "occ_equipe"];
+      fields.forEach(id => payload[id] = getValue(id));
+      localStorage.setItem("checkfire_app_data", JSON.stringify(payload));
+      showToast("Projeto salvo!");
+    }
+
+    function loadLocal() {
+      const saved = localStorage.getItem("checkfire_app_data");
+      if (!saved) return;
+      try {
+        const payload = JSON.parse(saved);
+        logoData = payload.logoData || "";
+        equipment = (payload.equipment || []).map(normalizeChecks);
+        if(payload.rel_categoria) setRadioValue("rel_categoria", payload.rel_categoria);
+        Object.keys(payload).forEach(id => { if (id !== "logoData" && id !== "equipment" && id !== "rel_categoria") setValue(id, payload[id]); });
+        
+        if (logoData) {
+          document.querySelectorAll(".logo-preview-container").forEach(el => {
+            el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-12 object-contain" />`;
+          });
+        }
+      } catch (e) { console.error(e); }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const d1 = document.getElementById("data"), d2 = document.getElementById("occ_data");
+      const hoje = new Date().toISOString().split('T')[0];
+      if (d1 && !d1.value) d1.value = hoje;
+      if (d2 && !d2.value) d2.value = hoje;
+      
+      loadLocal(); checkAuth(); renderList(); renderPrint();
+    });
+  </script>
+</body>
+</html>
