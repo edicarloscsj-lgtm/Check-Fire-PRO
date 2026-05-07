@@ -75,7 +75,7 @@
     /* Estilos de Impressão (A4) */
     .print-page { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; }
     .print-header { display: grid; grid-template-columns: 45mm 1fr 38mm; border: 1px solid #000; margin-bottom: 6px; min-height: 32mm; }
-    .print-logo { border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; font-size: 9px; font-weight: bold; }
+    .print-logo { border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; font-size: 9px; font-weight: bold; overflow: hidden; }
     .print-logo img { max-width: 100%; max-height: 30mm; object-fit: contain; }
     .print-title { padding: 5px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
     .print-title h2 { margin: 0; font-size: 13px; text-transform: uppercase; font-weight: bold; }
@@ -127,8 +127,8 @@
     .signature-line { border-top: 1px solid #000; text-align: center; padding-top: 4px; }
 
     /* Toast Notifications */
-    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-    .toast { background: #1a2942; color: white; padding: 12px 20px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 90%; max-width: 320px; }
+    .toast { background: #1a2942; color: white; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; pointer-events: auto; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
     @media print {
@@ -164,58 +164,56 @@
 
   <!-- ================= LANDING PAGE ================= -->
   <div id="view-landing" class="absolute inset-0 z-50 bg-slate-50 overflow-y-auto no-print flex flex-col">
-    <!-- Navbar Landing -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <svg class="w-10 h-10 drop-shadow-md"><use href="#brand-shield"></use></svg>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <svg class="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-md"><use href="#brand-shield"></use></svg>
           <div class="flex flex-col">
-            <span class="font-black text-xl tracking-tight text-navy-800 leading-none">Check<span class="text-brand-600">Fire</span> Pro</span>
-            <span class="text-[9px] font-bold tracking-widest text-slate-500 uppercase">Operacional SCI</span>
+            <span class="font-black text-lg sm:text-xl tracking-tight text-navy-800 leading-none">Check<span class="text-brand-600">Fire</span> Pro</span>
+            <span class="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-500 uppercase">Operacional SCI</span>
           </div>
         </div>
-        <button onclick="showLogin()" class="text-sm font-bold text-navy-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-colors">
-          Acessar Sistema
+        <button onclick="showLogin()" class="text-xs sm:text-sm font-bold text-navy-800 bg-slate-100 hover:bg-slate-200 px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors">
+          Acessar <span class="hidden sm:inline">Sistema</span>
         </button>
       </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-20 text-center max-w-4xl mx-auto">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-xs font-bold mb-6">
+    <section class="flex-1 flex flex-col items-center justify-center px-4 py-10 sm:py-20 text-center max-w-4xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-[10px] sm:text-xs font-bold mb-4 sm:mb-6">
         <i class="ph-fill ph-star"></i> O melhor SaaS para Bombeiros Civis
       </div>
-      <h1 class="text-4xl sm:text-6xl font-black text-navy-800 tracking-tight leading-tight mb-6">
+      <h1 class="text-3xl sm:text-6xl font-black text-navy-800 tracking-tight leading-tight mb-4 sm:mb-6">
         A tecnologia chegou às <span class="text-brand-600">Inspeções e Ocorrências</span>
       </h1>
-      <p class="text-lg sm:text-xl text-slate-500 mb-10 max-w-2xl leading-relaxed">
+      <p class="text-base sm:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl leading-relaxed">
         Gere checklists digitais e relatórios (ROE/RAA/RPI) padronizados em PDF com a sua logo ou formatados diretamente para o WhatsApp.
       </p>
       
-      <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-        <a href="https://mpago.la/2Xkmxe6" target="_blank" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-brand-700 transition-all shadow-xl shadow-brand-600/30 hover:-translate-y-1">
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <a href="https://mpago.la/2Xkmxe6" target="_blank" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-6 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-brand-700 transition-all shadow-xl shadow-brand-600/30">
           <i class="ph-bold ph-shopping-cart"></i> Assinar Acesso (R$ 14,90)
         </a>
-        <a href="https://wa.me/5571992756180" target="_blank" class="flex items-center justify-center gap-2 bg-white text-navy-800 border-2 border-slate-200 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 hover:border-slate-300 transition-all hover:-translate-y-1">
+        <a href="https://wa.me/5571992756180" target="_blank" class="flex items-center justify-center gap-2 bg-white text-navy-800 border-2 border-slate-200 px-6 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-slate-50 hover:border-slate-300 transition-all">
           <i class="ph-fill ph-whatsapp-logo text-green-500 text-2xl"></i> Dúvidas?
         </a>
       </div>
 
-      <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8 text-left border-t border-slate-200 pt-16 w-full">
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-          <div class="w-12 h-12 bg-navy-50 text-navy-700 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="ph-duotone ph-list-checks"></i></div>
-          <h3 class="font-bold text-navy-800 mb-2">Checklists em Prancheta</h3>
-          <p class="text-sm text-slate-500">Crie listas de verificação personalizadas, insira a sua logo e imprima o formulário perfeito em A4.</p>
+      <div class="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-left border-t border-slate-200 pt-10 sm:pt-16 w-full">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-navy-50 text-navy-700 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4"><i class="ph-duotone ph-list-checks"></i></div>
+          <h3 class="font-bold text-navy-800 mb-1 sm:mb-2 text-sm sm:text-base">Checklists em Prancheta</h3>
+          <p class="text-xs sm:text-sm text-slate-500">Crie listas de verificação personalizadas, insira a sua logo e imprima o formulário perfeito em A4.</p>
         </div>
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-          <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="ph-duotone ph-warning-octagon"></i></div>
-          <h3 class="font-bold text-navy-800 mb-2">Relatórios Oficiais</h3>
-          <p class="text-sm text-slate-500">Gere ROE (Ocorrências), RAA (Acompanhamento) e RPI (Prevenção) no padrão NBR.</p>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4"><i class="ph-duotone ph-warning-octagon"></i></div>
+          <h3 class="font-bold text-navy-800 mb-1 sm:mb-2 text-sm sm:text-base">Relatórios Oficiais</h3>
+          <p class="text-xs sm:text-sm text-slate-500">Gere ROE (Ocorrências), RAA (Acompanhamento) e RPI (Prevenção) no padrão NBR.</p>
         </div>
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-          <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="ph-duotone ph-whatsapp-logo"></i></div>
-          <h3 class="font-bold text-navy-800 mb-2">Automação WhatsApp</h3>
-          <p class="text-sm text-slate-500">Com um clique, os dados viram um relatório formatado com emojis e negrito para copiar e colar no grupo.</p>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4"><i class="ph-duotone ph-whatsapp-logo"></i></div>
+          <h3 class="font-bold text-navy-800 mb-1 sm:mb-2 text-sm sm:text-base">Automação WhatsApp</h3>
+          <p class="text-xs sm:text-sm text-slate-500">Com um clique, os dados viram um relatório formatado com emojis e negrito para colar no grupo.</p>
         </div>
       </div>
     </section>
@@ -223,19 +221,19 @@
 
   <!-- ================= TELA DE LOGIN ================= -->
   <div id="view-login" class="absolute inset-0 z-50 bg-navy-900 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-      <svg class="w-20 h-20 mx-auto mb-6 drop-shadow-md"><use href="#brand-shield"></use></svg>
-      <h2 class="text-2xl font-black text-center text-navy-800 mb-2">Área Restrita</h2>
-      <p class="text-center text-sm text-slate-500 mb-8">Digite sua senha para acessar o painel operacional.</p>
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl">
+      <svg class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 drop-shadow-md"><use href="#brand-shield"></use></svg>
+      <h2 class="text-xl sm:text-2xl font-black text-center text-navy-800 mb-2">Área Restrita</h2>
+      <p class="text-center text-xs sm:text-sm text-slate-500 mb-6 sm:mb-8">Digite sua senha para acessar o painel operacional.</p>
       
       <form onsubmit="handleLogin(event)">
         <label class="label-standard">Senha de Acesso</label>
-        <input type="password" id="loginPassword" class="input-standard mb-6 text-center text-xl tracking-widest" placeholder="••••••••" required />
+        <input type="password" id="loginPassword" class="input-standard mb-5 sm:mb-6 text-center text-lg sm:text-xl tracking-widest" placeholder="••••••••" required />
         
-        <button type="submit" class="w-full bg-brand-600 text-white font-bold rounded-xl py-4 hover:bg-brand-700 transition-colors shadow-lg shadow-brand-600/30">
+        <button type="submit" class="w-full bg-brand-600 text-white font-bold rounded-xl py-3.5 sm:py-4 hover:bg-brand-700 transition-colors shadow-lg shadow-brand-600/30">
           Entrar no Sistema
         </button>
-        <button type="button" onclick="showLanding()" class="w-full mt-3 bg-transparent text-slate-500 font-bold rounded-xl py-3 hover:bg-slate-50 transition-colors">
+        <button type="button" onclick="showLanding()" class="w-full mt-2 sm:mt-3 bg-transparent text-slate-500 font-bold rounded-xl py-3 hover:bg-slate-50 transition-colors">
           Voltar
         </button>
       </form>
@@ -247,23 +245,23 @@
   <div id="view-app" class="flex-col h-full hidden w-full">
     <!-- Header Fixo Topo -->
     <header class="no-print bg-navy-800 text-white shadow-md z-40 shrink-0 border-b border-navy-700">
-      <div class="max-w-[1400px] mx-auto px-4 py-3 sm:px-6 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-          <svg class="w-10 h-10 drop-shadow-lg"><use href="#brand-shield"></use></svg>
+      <div class="max-w-[1400px] mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2 sm:gap-3">
+          <svg class="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-lg"><use href="#brand-shield"></use></svg>
           <div>
-            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">Check<span class="text-brand-500">Fire</span> Pro</h1>
-            <p class="text-slate-400 text-[9px] sm:text-[10px] uppercase tracking-widest font-bold">Painel Operacional</p>
+            <h1 class="text-base sm:text-xl font-bold tracking-tight text-white leading-tight">Check<span class="text-brand-500">Fire</span></h1>
+            <p class="text-slate-400 text-[8px] sm:text-[10px] uppercase tracking-widest font-bold">Painel Operacional</p>
           </div>
         </div>
-        <div class="flex gap-2">
-          <button type="button" onclick="triggerPrint()" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-lg font-bold text-sm hover:bg-brand-700 transition-all shadow-md active:scale-95">
-            <i class="ph-bold ph-printer text-lg"></i> <span class="hidden sm:inline">Imprimir / PDF</span>
+        <div class="flex gap-1.5 sm:gap-2">
+          <button type="button" onclick="triggerPrint()" class="flex items-center justify-center gap-1 sm:gap-2 bg-brand-600 text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold text-xs sm:text-sm hover:bg-brand-700 transition-all shadow-md active:scale-95">
+            <i class="ph-bold ph-printer text-base sm:text-lg"></i> <span class="hidden sm:inline">PDF</span>
           </button>
-          <button type="button" onclick="saveLocal()" class="flex items-center justify-center p-2 sm:px-4 bg-navy-700 text-slate-200 rounded-lg hover:bg-navy-600 transition-all active:scale-95 border border-navy-600" title="Salvar Projeto">
-            <i class="ph-bold ph-floppy-disk text-lg"></i>
+          <button type="button" onclick="saveLocal()" class="flex items-center justify-center p-1.5 sm:p-2 sm:px-3 bg-navy-700 text-slate-200 rounded-lg hover:bg-navy-600 transition-all active:scale-95 border border-navy-600" title="Salvar Projeto">
+            <i class="ph-bold ph-floppy-disk text-base sm:text-lg"></i>
           </button>
-          <button type="button" onclick="handleLogout()" class="flex items-center justify-center p-2 bg-navy-700 text-red-400 rounded-lg hover:bg-brand-600 hover:text-white transition-all ml-1 border border-navy-600" title="Sair do Sistema">
-            <i class="ph-bold ph-sign-out text-lg"></i>
+          <button type="button" onclick="handleLogout()" class="flex items-center justify-center p-1.5 sm:p-2 bg-navy-700 text-red-400 rounded-lg hover:bg-brand-600 hover:text-white transition-all border border-navy-600" title="Sair do Sistema">
+            <i class="ph-bold ph-sign-out text-base sm:text-lg"></i>
           </button>
         </div>
       </div>
@@ -271,41 +269,42 @@
 
     <!-- Área Principal Rolável -->
     <main class="flex-1 overflow-y-auto app-main-container relative w-full no-print bg-slate-100">
-      <div class="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 w-full">
+      <div class="max-w-[1400px] mx-auto p-3 sm:p-6 lg:p-8 w-full">
         
         <!-- ================= ABA 1: INSPEÇÃO / CHECKLIST ================= -->
         <div id="tab-inspecao" class="tab-content active">
-          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8">
+          <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 xl:gap-8">
             
             <!-- Coluna 1: Cabeçalho do Formulário -->
-            <div class="xl:col-span-4 flex flex-col gap-6">
+            <div class="xl:col-span-4 flex flex-col gap-5 sm:gap-6">
               
               <!-- Bloco: Configurações do Documento (A4) -->
-              <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-navy-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
-                  <i class="ph-duotone ph-file-dashed text-brand-600 text-xl"></i> Formato Oficial (Impressão)
+              <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200">
+                <h2 class="text-base sm:text-lg font-bold text-navy-800 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 sm:pb-3">
+                  <i class="ph-duotone ph-file-dashed text-brand-600 text-lg sm:text-xl"></i> Formato de Impressão
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-3 sm:space-y-4">
                   <div>
-                    <label class="label-standard">Logo do Relatório (Sua Empresa/Cliente)</label>
-                    <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-navy-50 file:text-navy-700 file:font-bold hover:file:bg-navy-100 cursor-pointer w-full mb-2" />
-                    <div class="h-16 border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 text-slate-400 text-xs logo-preview-container">
+                    <label class="label-standard">Logo do Relatório (Empresa/Cliente)</label>
+                    <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-xs sm:text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-navy-50 file:text-navy-700 file:font-bold hover:file:bg-navy-100 cursor-pointer w-full mb-2" />
+                    <div class="h-14 sm:h-16 border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 text-slate-400 text-[10px] sm:text-xs logo-preview-container">
                       Logo do Relatório
                     </div>
                   </div>
 
+                  <!-- Ajuste Mobile: 3 colunas em telas pequenas podem ficar apertadas, mas usando text-xs funciona. -->
                   <div class="grid grid-cols-3 gap-2">
                     <div>
-                      <label for="codigo" class="label-standard">Código</label>
-                      <input id="codigo" class="input-standard !px-2 text-center" value="FR-001" oninput="renderPrint()" />
+                      <label for="codigo" class="label-standard truncate">Código</label>
+                      <input id="codigo" class="input-standard !px-1 sm:!px-2 text-center text-xs sm:text-sm" value="FR-001" oninput="renderPrint()" />
                     </div>
                     <div>
-                      <label for="versao" class="label-standard">Versão</label>
-                      <input id="versao" class="input-standard !px-2 text-center" value="Rev.00" oninput="renderPrint()" />
+                      <label for="versao" class="label-standard truncate">Versão</label>
+                      <input id="versao" class="input-standard !px-1 sm:!px-2 text-center text-xs sm:text-sm" value="Rev.00" oninput="renderPrint()" />
                     </div>
                     <div>
-                      <label for="periodicidade" class="label-standard">Período</label>
-                      <select id="periodicidade" class="input-standard !px-2" onchange="renderPrint()">
+                      <label for="periodicidade" class="label-standard truncate">Período</label>
+                      <select id="periodicidade" class="input-standard !px-1 sm:!px-2 text-xs sm:text-sm" onchange="renderPrint()">
                         <option>Mensal</option><option>Semanal</option><option>Anual</option>
                       </select>
                     </div>
@@ -314,59 +313,61 @@
               </div>
 
               <!-- Bloco: Dados da Inspeção -->
-              <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200">
-                <h2 class="text-lg font-bold text-navy-800 mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
-                  <i class="ph-duotone ph-buildings text-brand-600 text-xl"></i> Dados do Cliente
+              <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200">
+                <h2 class="text-base sm:text-lg font-bold text-navy-800 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 sm:pb-3">
+                  <i class="ph-duotone ph-buildings text-brand-600 text-lg sm:text-xl"></i> Dados do Cliente
                 </h2>
-                <div class="space-y-4">
+                <div class="space-y-3 sm:space-y-4">
                   <div>
                     <label for="tituloRelatorio" class="label-standard">Título do Relatório</label>
-                    <input id="tituloRelatorio" class="input-standard" value="Auditoria de Sistemas de Combate a Incêndio" oninput="renderPrint()" />
+                    <input id="tituloRelatorio" class="input-standard text-sm" value="Auditoria de Sistemas de Combate a Incêndio" oninput="renderPrint()" />
                   </div>
                   <div>
                     <label for="empresa" class="label-standard">Empresa / Cliente</label>
-                    <input id="empresa" class="input-standard" placeholder="Ex.: Condomínio Comercial..." oninput="renderPrint()" />
+                    <input id="empresa" class="input-standard text-sm" placeholder="Ex.: Condomínio Comercial..." oninput="renderPrint()" />
                   </div>
                   <div>
                     <label for="endereco" class="label-standard">Endereço Completo</label>
-                    <input id="endereco" class="input-standard" placeholder="Rua, número, cidade/UF..." oninput="renderPrint()" />
+                    <input id="endereco" class="input-standard text-sm" placeholder="Rua, número, cidade/UF..." oninput="renderPrint()" />
                   </div>
-                  <div class="grid grid-cols-2 gap-3">
+                  <!-- Ajuste Mobile: 1 coluna no celular, 2 no PC -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label for="setor" class="label-standard">Setor/Área</label>
-                      <input id="setor" class="input-standard" placeholder="Ex.: Bloco A" oninput="renderPrint()" />
+                      <input id="setor" class="input-standard text-sm" placeholder="Ex.: Bloco A" oninput="renderPrint()" />
                     </div>
                     <div>
                       <label for="data" class="label-standard">Data</label>
-                      <input type="date" id="data" class="input-standard" oninput="renderPrint()" />
+                      <input type="date" id="data" class="input-standard text-sm" oninput="renderPrint()" />
                     </div>
                   </div>
                   <div>
                     <label for="responsavel" class="label-standard">Inspetor(a) (Bombeiro Civil)</label>
-                    <input id="responsavel" class="input-standard" placeholder="Nome do responsável" oninput="renderPrint()" />
+                    <input id="responsavel" class="input-standard text-sm" placeholder="Nome do responsável" oninput="renderPrint()" />
                   </div>
                   
-                  <div class="h-px bg-slate-200 my-4"></div>
+                  <div class="h-px bg-slate-200 my-3 sm:my-4"></div>
                   
                   <div>
                     <label for="manualTipo" class="label-standard">Adicionar Equipamento</label>
-                    <select id="manualTipo" class="input-standard mb-3 font-semibold text-navy-800">
+                    <select id="manualTipo" class="input-standard mb-3 font-semibold text-navy-800 text-sm">
                       <option>Extintor</option><option>Hidrante</option><option>Porta de Emergência</option>
                       <option>Iluminação de Emergência</option><option>Alarme de Incêndio</option>
                       <option>Sinalização de Emergência</option><option>Sprinkler</option>
                       <option>Bomba de Incêndio</option><option>Detector de Fumaça</option><option>Outro</option>
                     </select>
-                    <div class="grid grid-cols-2 gap-3 mb-3">
-                      <input id="manualPatrimonio" class="input-standard" placeholder="ID/Patrimônio" />
-                      <input id="manualLocal" class="input-standard" placeholder="Local" />
+                    <!-- Ajuste Mobile: 1 coluna no celular para não ficar apertado -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                      <input id="manualPatrimonio" class="input-standard text-sm" placeholder="ID/Patrimônio" />
+                      <input id="manualLocal" class="input-standard text-sm" placeholder="Localização" />
                     </div>
-                    <button type="button" onclick="addEquipment()" class="w-full flex items-center justify-center gap-2 bg-navy-800 text-white px-4 py-3.5 rounded-xl font-bold text-sm hover:bg-navy-900 transition-all active:scale-[0.98] shadow-md">
+                    <button type="button" onclick="addEquipment()" class="w-full flex items-center justify-center gap-2 bg-navy-800 text-white px-4 py-3 sm:py-3.5 rounded-xl font-bold text-sm hover:bg-navy-900 transition-all active:scale-[0.98] shadow-md">
                       <i class="ph-bold ph-plus"></i> Inserir no Formulário
                     </button>
                   </div>
 
-                  <button type="button" onclick="resetAnswers()" class="w-full mt-2 flex items-center justify-center gap-2 bg-white text-slate-700 border-2 border-slate-200 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">
-                    <i class="ph-bold ph-eraser text-lg text-slate-400"></i> Preparar para Prancheta (Limpar)
+                  <button type="button" onclick="resetAnswers()" class="w-full mt-2 flex items-center justify-center gap-2 bg-white text-slate-700 border-2 border-slate-200 px-4 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-50 transition-all">
+                    <i class="ph-bold ph-eraser text-base sm:text-lg text-slate-400"></i> Preparar p/ Prancheta (Limpar)
                   </button>
                 </div>
               </div>
@@ -374,18 +375,18 @@
 
             <!-- Coluna 2: Formulário Digital Gerado -->
             <div class="xl:col-span-8">
-              <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 min-h-full">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-slate-100 pb-3">
-                  <h2 class="text-xl font-bold text-navy-800 flex items-center gap-2">
+              <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200 min-h-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4 border-b border-slate-100 pb-3">
+                  <h2 class="text-lg sm:text-xl font-bold text-navy-800 flex items-center gap-2">
                     <i class="ph-duotone ph-list-numbers text-brand-600"></i> Estrutura do Formulário
                   </h2>
-                  <button type="button" onclick="addExtintorAreaExample()" class="text-xs bg-brand-50 text-brand-700 px-3 py-2 rounded-lg font-bold hover:bg-brand-100 border border-brand-200 transition-colors">
+                  <button type="button" onclick="addExtintorAreaExample()" class="text-xs bg-brand-50 text-brand-700 px-3 py-2 rounded-lg font-bold hover:bg-brand-100 border border-brand-200 transition-colors self-start sm:self-auto">
                     <i class="ph-bold ph-magic-wand"></i> Inserir Exemplo
                   </button>
                 </div>
-                <p class="text-xs text-slate-500 mb-6">Clique nos textos (pergunta, local) para editar in-line. Deixe as marcações (C/NC/NA) em branco caso vá imprimir a folha A4 e preencher à mão.</p>
+                <p class="text-[11px] sm:text-xs text-slate-500 mb-5 sm:mb-6">Clique nos textos (pergunta, local) para editar in-line. Deixe as marcações (C/NC/NA) em branco caso vá imprimir a folha A4 e preencher à mão.</p>
                 
-                <div id="equipmentList" class="flex flex-col gap-5">
+                <div id="equipmentList" class="flex flex-col gap-4 sm:gap-5">
                   <!-- Injetado via JS -->
                 </div>
               </div>
@@ -396,123 +397,124 @@
         <!-- ================= ABA 2: RELATÓRIOS (OCORRÊNCIA / ACOMPANHAMENTO) ================= -->
         <div id="tab-relatorios" class="tab-content">
           <div class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200">
-              <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-5">
-                <div class="w-14 h-14 rounded-2xl bg-navy-50 text-navy-700 flex items-center justify-center text-3xl border border-navy-100">
+            <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-8 shadow-sm border border-slate-200">
+              <div class="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6 border-b border-slate-100 pb-4 sm:pb-5">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-navy-50 text-navy-700 flex items-center justify-center text-2xl sm:text-3xl border border-navy-100 shrink-0">
                   <i class="ph-duotone ph-files"></i>
                 </div>
                 <div>
-                  <h2 class="text-2xl font-bold text-navy-800">Relatórios Operacionais</h2>
-                  <p class="text-sm text-slate-500 mt-1">Gere relatórios oficias no padrão NBR.</p>
+                  <h2 class="text-xl sm:text-2xl font-bold text-navy-800 leading-tight">Relatórios Operacionais</h2>
+                  <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Gere relatórios oficias no padrão NBR.</p>
                 </div>
               </div>
 
-              <div class="space-y-6">
+              <div class="space-y-5 sm:space-y-6">
                 <!-- LOGO UPLOAD PARA RELATÓRIOS -->
-                <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl">
+                <div class="bg-slate-50 border border-slate-200 p-3 sm:p-4 rounded-xl">
                   <label class="label-standard">Logo do Relatório (Sua Empresa/Cliente)</label>
-                  <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-navy-100 file:text-navy-700 file:font-bold hover:file:bg-navy-200 cursor-pointer w-full mb-2" />
-                  <div class="h-16 border border-slate-300 rounded-xl flex items-center justify-center overflow-hidden bg-white text-slate-400 text-xs logo-preview-container">
+                  <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-xs sm:text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-navy-100 file:text-navy-700 file:font-bold hover:file:bg-navy-200 cursor-pointer w-full mb-2" />
+                  <div class="h-14 sm:h-16 border border-slate-300 rounded-xl flex items-center justify-center overflow-hidden bg-white text-slate-400 text-[10px] sm:text-xs logo-preview-container">
                     Logo do Relatório
                   </div>
                 </div>
 
                 <!-- SELETOR PRINCIPAL DO TIPO DE RELATÓRIO (SEGMENT CONTROL) -->
-                <div class="mb-6">
-                  <label class="label-standard text-navy-800 mb-3 text-center sm:text-left"><i class="ph-bold ph-tag"></i> Tipo de Relatório a ser gerado</label>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="mb-5 sm:mb-6">
+                  <label class="label-standard text-navy-800 mb-2 sm:mb-3 text-center sm:text-left"><i class="ph-bold ph-tag"></i> Tipo de Relatório a ser gerado</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                     <label class="segment-radio">
                       <input type="radio" name="rel_categoria" value="RAA" checked onchange="renderPrint()">
-                      <div class="segment-label">
-                        <i class="ph-duotone ph-clipboard-text text-xl mb-1"></i>
+                      <div class="segment-label !py-2 sm:!py-3">
+                        <i class="ph-duotone ph-clipboard-text text-lg sm:text-xl mb-1"></i>
                         Acompanhamento (RAA)
                       </div>
                     </label>
                     <label class="segment-radio">
                       <input type="radio" name="rel_categoria" value="ROE" onchange="renderPrint()">
-                      <div class="segment-label">
-                        <i class="ph-duotone ph-warning-octagon text-xl mb-1"></i>
+                      <div class="segment-label !py-2 sm:!py-3">
+                        <i class="ph-duotone ph-warning-octagon text-lg sm:text-xl mb-1"></i>
                         Ocorrência (ROE)
                       </div>
                     </label>
                     <label class="segment-radio">
                       <input type="radio" name="rel_categoria" value="RPI" onchange="renderPrint()">
-                      <div class="segment-label">
-                        <i class="ph-duotone ph-shield-check text-xl mb-1"></i>
+                      <div class="segment-label !py-2 sm:!py-3">
+                        <i class="ph-duotone ph-shield-check text-lg sm:text-xl mb-1"></i>
                         Prevenção (RPI)
                       </div>
                     </label>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                   <div>
                     <label class="label-standard">Natureza / Atividade</label>
-                    <input id="occ_tipo" class="input-standard" placeholder="Ex: Liberação de PT, Princípio de Incêndio..." oninput="renderPrint()" />
+                    <input id="occ_tipo" class="input-standard text-sm" placeholder="Ex: Liberação de PT, Princípio de Incêndio..." oninput="renderPrint()" />
                   </div>
                   <div>
-                    <label class="label-standard">Solicitante / Setor Acompanhado</label>
-                    <input id="occ_solicitante" class="input-standard" placeholder="Ex: Manutenção Elétrica..." oninput="renderPrint()" />
+                    <label class="label-standard">Solicitante / Setor</label>
+                    <input id="occ_solicitante" class="input-standard text-sm" placeholder="Ex: Manutenção Elétrica..." oninput="renderPrint()" />
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                <!-- Ajuste Mobile: Datas em 1 col, horas em 2 cols -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
                   <div class="col-span-2 sm:col-span-1">
                     <label class="label-standard">Data</label>
-                    <input type="date" id="occ_data" class="input-standard" oninput="renderPrint()" />
+                    <input type="date" id="occ_data" class="input-standard text-sm" oninput="renderPrint()" />
                   </div>
                   <div class="col-span-1">
-                    <label class="label-standard">Hora Início</label>
-                    <input type="time" id="occ_hora_inicio" class="input-standard" oninput="renderPrint()" />
+                    <label class="label-standard truncate">Hora Início</label>
+                    <input type="time" id="occ_hora_inicio" class="input-standard text-sm !px-2" oninput="renderPrint()" />
                   </div>
                   <div class="col-span-1">
-                    <label class="label-standard">Chegada</label>
-                    <input type="time" id="occ_hora_chegada" class="input-standard" oninput="renderPrint()" />
+                    <label class="label-standard truncate">Chegada</label>
+                    <input type="time" id="occ_hora_chegada" class="input-standard text-sm !px-2" oninput="renderPrint()" />
                   </div>
-                  <div class="col-span-1">
-                    <label class="label-standard">Hora Fim</label>
-                    <input type="time" id="occ_hora_fim" class="input-standard" oninput="renderPrint()" />
+                  <div class="col-span-2 sm:col-span-1">
+                    <label class="label-standard truncate">Hora Fim</label>
+                    <input type="time" id="occ_hora_fim" class="input-standard text-sm" oninput="renderPrint()" />
                   </div>
                 </div>
 
                 <div>
                   <label class="label-standard">Local Exato da Atividade / Ocorrência</label>
-                  <input id="occ_local" class="input-standard" placeholder="Ex: Galpão 3, Máquina de Solda B" oninput="renderPrint()" />
+                  <input id="occ_local" class="input-standard text-sm" placeholder="Ex: Galpão 3, Máquina de Solda B" oninput="renderPrint()" />
                 </div>
 
                 <div>
                   <label class="label-standard">1. Histórico e Relato do Fato</label>
-                  <textarea id="occ_historico" class="input-standard min-h-[100px]" placeholder="Descreva a situação inicial, como a equipe encontrou a cena ou os detalhes da atividade..." oninput="renderPrint()"></textarea>
+                  <textarea id="occ_historico" class="input-standard min-h-[90px] sm:min-h-[100px] text-sm" placeholder="Descreva a situação inicial, como a equipe encontrou a cena ou os detalhes da atividade..." oninput="renderPrint()"></textarea>
                 </div>
 
                 <div>
                   <label class="label-standard">2. Ações de Prevenção / Intervenção Realizadas</label>
-                  <textarea id="occ_acoes" class="input-standard min-h-[100px]" placeholder="Quais procedimentos adotados? (Ex: Isolamento, uso de extintores, inspeção prévia...)" oninput="renderPrint()"></textarea>
+                  <textarea id="occ_acoes" class="input-standard min-h-[90px] sm:min-h-[100px] text-sm" placeholder="Quais procedimentos adotados? (Ex: Isolamento, uso de extintores, inspeção prévia...)" oninput="renderPrint()"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                   <div>
                     <label class="label-standard">Materiais Utilizados</label>
-                    <textarea id="occ_materiais" class="input-standard min-h-[90px]" placeholder="Ex: Fita zebrada, Rádio, Extintor..." oninput="renderPrint()"></textarea>
+                    <textarea id="occ_materiais" class="input-standard min-h-[70px] sm:min-h-[90px] text-sm" placeholder="Ex: Fita zebrada, Rádio, Extintor..." oninput="renderPrint()"></textarea>
                   </div>
                   <div>
                     <label class="label-standard">Houve Vítimas / Acidentes?</label>
-                    <select id="occ_vitimas" class="input-standard mb-3" onchange="renderPrint()">
+                    <select id="occ_vitimas" class="input-standard mb-2 sm:mb-3 text-sm" onchange="renderPrint()">
                       <option value="NÃO">Não / N/A</option>
                       <option value="SIM">Sim, com vítimas</option>
                     </select>
-                    <input id="occ_vitimas_desc" class="input-standard" placeholder="Se sim, descreva o estado/destino." oninput="renderPrint()" />
+                    <input id="occ_vitimas_desc" class="input-standard text-sm" placeholder="Se sim, descreva o estado/destino." oninput="renderPrint()" />
                   </div>
                 </div>
 
                 <div>
                   <label class="label-standard">Conclusão / Situação Final</label>
-                  <input id="occ_conclusao" class="input-standard" placeholder="Ex: Atividade concluída sem alterações. Local seguro." oninput="renderPrint()" />
+                  <input id="occ_conclusao" class="input-standard text-sm" placeholder="Ex: Atividade concluída sem alterações. Local seguro." oninput="renderPrint()" />
                 </div>
 
                 <div>
                   <label class="label-standard">Equipe Empreendida (Bombeiros/Brigadistas)</label>
-                  <input id="occ_equipe" class="input-standard" placeholder="Nomes dos profissionais..." oninput="renderPrint()" />
+                  <input id="occ_equipe" class="input-standard text-sm" placeholder="Nomes dos profissionais..." oninput="renderPrint()" />
                 </div>
               </div>
             </div>
@@ -522,48 +524,48 @@
         <!-- ================= ABA 3: EXPORTAR WHATSAPP ================= -->
         <div id="tab-whatsapp" class="tab-content">
           <div class="max-w-2xl mx-auto">
-            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200">
-              <div class="text-center mb-6">
-                <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-3xl mx-auto mb-3">
+            <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200">
+              <div class="text-center mb-5 sm:mb-6">
+                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-2xl sm:text-3xl mx-auto mb-2 sm:mb-3">
                   <i class="ph-fill ph-whatsapp-logo"></i>
                 </div>
-                <h2 class="text-xl font-bold text-navy-800">Exportar para WhatsApp</h2>
-                <p class="text-sm text-slate-500">Gere um texto formatado pronto para enviar no grupo operacional.</p>
+                <h2 class="text-lg sm:text-xl font-bold text-navy-800">Exportar para WhatsApp</h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Gere um texto formatado pronto para enviar no grupo operacional.</p>
               </div>
 
               <!-- Escolha do que exportar no WhatsApp -->
-              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6">
-                <label class="label-standard text-center mb-3">O que você deseja compartilhar?</label>
+              <div class="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 mb-5 sm:mb-6">
+                <label class="label-standard text-center mb-2 sm:mb-3 text-[10px] sm:text-xs">O que você deseja compartilhar?</label>
                 <div class="grid grid-cols-2 gap-2">
                   <label class="segment-radio">
                     <input type="radio" name="wp_type" value="REL" checked onchange="generateWhatsAppReport()">
-                    <div class="segment-label !py-2"><i class="ph-duotone ph-file-text text-lg"></i> Relatório <br><span class="text-[9px] font-normal">(Aba Relatórios)</span></div>
+                    <div class="segment-label !py-2 sm:!py-2"><i class="ph-duotone ph-file-text text-base sm:text-lg"></i> Relatório <br><span class="text-[8px] sm:text-[9px] font-normal">(Aba Relatórios)</span></div>
                   </label>
                   <label class="segment-radio">
                     <input type="radio" name="wp_type" value="CHK" onchange="generateWhatsAppReport()">
-                    <div class="segment-label !py-2"><i class="ph-duotone ph-list-checks text-lg"></i> Resumo Inspeção <br><span class="text-[9px] font-normal">(Aba Inspeção)</span></div>
+                    <div class="segment-label !py-2 sm:!py-2"><i class="ph-duotone ph-list-checks text-base sm:text-lg"></i> Resumo Inspeção <br><span class="text-[8px] sm:text-[9px] font-normal">(Aba Inspeção)</span></div>
                   </label>
                 </div>
               </div>
 
-              <textarea id="whatsappOutput" class="w-full border-2 border-slate-200 rounded-xl px-4 py-4 text-sm text-slate-800 bg-white focus:outline-none focus:border-green-500 min-h-[350px] font-mono leading-relaxed resize-y shadow-inner"></textarea>
+              <textarea id="whatsappOutput" class="w-full border-2 border-slate-200 rounded-xl px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-slate-800 bg-white focus:outline-none focus:border-green-500 min-h-[300px] sm:min-h-[350px] font-mono leading-relaxed resize-y shadow-inner"></textarea>
 
-              <button type="button" onclick="copyWhatsAppText()" class="w-full mt-4 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-4 rounded-xl font-bold text-base hover:bg-green-700 transition-all shadow-lg shadow-green-600/30 active:scale-[0.98]">
-                <i class="ph-bold ph-copy text-xl"></i> Copiar Texto
+              <button type="button" onclick="copyWhatsAppText()" class="w-full mt-4 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base hover:bg-green-700 transition-all shadow-lg shadow-green-600/30 active:scale-[0.98]">
+                <i class="ph-bold ph-copy text-lg sm:text-xl"></i> Copiar Texto
               </button>
             </div>
           </div>
         </div>
 
         <!-- ================= PRÉ-VISUALIZAÇÃO A4 (Sempre Visível) ================= -->
-        <div class="no-print mt-10 pb-8" id="printPreviewContainer">
-          <div class="flex items-center justify-between mb-4 border-t border-slate-300 pt-6">
-             <div class="flex items-center gap-2 text-navy-800 font-black text-sm uppercase tracking-wider">
-               <i class="ph-bold ph-printer text-xl"></i> Pré-visualização do Documento (A4)
+        <div class="no-print mt-8 sm:mt-10 pb-4 sm:pb-8" id="printPreviewContainer">
+          <div class="flex items-center justify-between mb-3 sm:mb-4 border-t border-slate-300 pt-5 sm:pt-6">
+             <div class="flex items-center gap-2 text-navy-800 font-black text-xs sm:text-sm uppercase tracking-wider">
+               <i class="ph-bold ph-printer text-lg sm:text-xl"></i> Pré-visualização (A4)
              </div>
           </div>
-          <!-- A div abaixo permite scroll horizontal no celular sem quebrar o layout da A4 -->
-          <div class="overflow-x-auto pb-4 custom-scrollbar">
+          <!-- Container de Scroll Horizontal Suave -->
+          <div class="overflow-x-auto pb-4 custom-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
             <div class="print-page shadow-xl border border-slate-300 mx-auto" id="printPage" style="transform-origin: top left; min-width: 210mm;">
               <!-- O conteúdo da folha é injetado aqui -->
             </div>
@@ -575,17 +577,17 @@
 
     <!-- Navigation Bar Inferior (Estilo App) -->
     <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 z-50 px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.03)] no-print">
-      <div class="max-w-[1400px] mx-auto h-[72px] sm:h-20 flex justify-around items-center">
+      <div class="max-w-[1400px] mx-auto h-[68px] sm:h-20 flex justify-around items-center">
         <button class="nav-item active" onclick="switchTab('tab-inspecao', this)">
-          <i class="ph-fill ph-clipboard-text text-[26px] sm:text-3xl mb-0.5"></i>
+          <i class="ph-fill ph-clipboard-text text-[24px] sm:text-3xl mb-0.5"></i>
           <span class="text-[10px] sm:text-xs font-semibold tracking-wide">Inspeção</span>
         </button>
         <button class="nav-item" onclick="switchTab('tab-relatorios', this)">
-          <i class="ph-fill ph-files text-[26px] sm:text-3xl mb-0.5"></i>
+          <i class="ph-fill ph-files text-[24px] sm:text-3xl mb-0.5"></i>
           <span class="text-[10px] sm:text-xs font-semibold tracking-wide">Relatórios</span>
         </button>
         <button class="nav-item" onclick="switchTab('tab-whatsapp', this)">
-          <i class="ph-fill ph-whatsapp-logo text-[26px] sm:text-3xl mb-0.5"></i>
+          <i class="ph-fill ph-whatsapp-logo text-[24px] sm:text-3xl mb-0.5"></i>
           <span class="text-[10px] sm:text-xs font-semibold tracking-wide">WhatsApp</span>
         </button>
       </div>
@@ -671,7 +673,7 @@
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      const icon = type === 'success' ? '<i class="ph-fill ph-check-circle text-green-400 text-2xl"></i>' : type === 'error' ? '<i class="ph-fill ph-x-circle text-brand-500 text-2xl"></i>' : '<i class="ph-fill ph-info text-blue-400 text-2xl"></i>';
+      const icon = type === 'success' ? '<i class="ph-fill ph-check-circle text-green-400 text-xl sm:text-2xl"></i>' : type === 'error' ? '<i class="ph-fill ph-x-circle text-brand-500 text-xl sm:text-2xl"></i>' : '<i class="ph-fill ph-info text-blue-400 text-xl sm:text-2xl"></i>';
       toast.className = 'toast';
       toast.innerHTML = `${icon} <span>${escapeHTML(message)}</span>`;
       container.appendChild(toast);
@@ -687,7 +689,7 @@
       reader.onload = e => {
         logoData = e.target.result;
         document.querySelectorAll(".logo-preview-container").forEach(el => {
-          el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-12 object-contain" />`;
+          el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-10 sm:max-h-12 object-contain" />`;
         });
         renderPrint();
       };
@@ -762,10 +764,10 @@
       equipment = equipment.map(normalizeChecks);
 
       if (!equipment.length) {
-        el.innerHTML = `<div class="border-2 border-dashed border-slate-200 rounded-3xl p-10 text-center flex flex-col items-center">
-            <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-3xl mb-3"><i class="ph-duotone ph-clipboard-text"></i></div>
-            <h3 class="text-base font-bold text-slate-700">Checklist Vazio</h3>
-            <p class="text-slate-500 text-xs mt-1">Adicione itens no painel ao lado.</p>
+        el.innerHTML = `<div class="border-2 border-dashed border-slate-200 rounded-[1.25rem] sm:rounded-3xl p-8 sm:p-10 text-center flex flex-col items-center">
+            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-3"><i class="ph-duotone ph-clipboard-text"></i></div>
+            <h3 class="text-sm sm:text-base font-bold text-slate-700">Checklist Vazio</h3>
+            <p class="text-slate-500 text-[10px] sm:text-xs mt-1">Adicione itens no painel.</p>
           </div>`;
         return;
       }
@@ -774,45 +776,47 @@
         const iconClass = iconMap[item.tipo] || iconMap["Outro"];
         const checksHtml = item.checks.map((check, checkIndex) => {
           const isC = check.status === STATUS.CONFORME, isNC = check.status === STATUS.NAO_CONFORME, isNA = check.status === STATUS.NAO_APLICA;
+          
+          /* Ajuste Mobile: flex-col e botões ocupando w-full */
           return `
-            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 p-3 items-start sm:items-center border-b border-slate-100 hover:bg-slate-50 transition-colors">
-              <div class="flex-1 w-full flex items-start sm:items-center gap-2">
-                <span class="text-slate-400 font-bold text-xs mt-1 sm:mt-0 w-4">${checkIndex + 1}.</span> 
-                <input type="text" value="${escapeHTML(check.text)}" class="inline-edit text-xs sm:text-sm font-medium text-navy-800 py-1" onchange="updateCheckText('${item.id}', ${checkIndex}, this.value)" title="Editar pergunta">
+            <div class="flex flex-col lg:flex-row gap-2 lg:gap-3 p-3 items-start lg:items-center border-b border-slate-100 hover:bg-slate-50 transition-colors">
+              <div class="flex-1 w-full flex items-start lg:items-center gap-1.5 sm:gap-2">
+                <span class="text-slate-400 font-bold text-[10px] sm:text-xs mt-1 lg:mt-0 w-3 sm:w-4">${checkIndex + 1}.</span> 
+                <input type="text" value="${escapeHTML(check.text)}" class="inline-edit text-xs sm:text-sm font-medium text-navy-800 py-1 flex-1 min-w-0" onchange="updateCheckText('${item.id}', ${checkIndex}, this.value)" title="Editar pergunta">
               </div>
-              <div class="flex items-center gap-2 w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
-                <div class="flex p-1 bg-slate-100 rounded-lg shrink-0 gap-1 shadow-inner">
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="w-10 h-8 rounded text-xs font-bold transition-all ${isC ? 'bg-green-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">C</button>
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="w-10 h-8 rounded text-xs font-bold transition-all ${isNC ? 'bg-brand-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NC</button>
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="w-10 h-8 rounded text-xs font-bold transition-all ${isNA ? 'bg-slate-400 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NA</button>
+              <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
+                <div class="flex p-1 bg-slate-100 rounded-lg shrink-0 gap-1 shadow-inner w-full sm:w-auto justify-between sm:justify-start">
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="flex-1 sm:flex-none sm:w-10 h-10 sm:h-8 rounded text-xs font-bold transition-all ${isC ? 'bg-green-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">C</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="flex-1 sm:flex-none sm:w-10 h-10 sm:h-8 rounded text-xs font-bold transition-all ${isNC ? 'bg-brand-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NC</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="flex-1 sm:flex-none sm:w-10 h-10 sm:h-8 rounded text-xs font-bold transition-all ${isNA ? 'bg-slate-400 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NA</button>
                 </div>
-                <input type="text" class="flex-1 sm:w-32 border border-slate-200 rounded-lg px-2 py-1.5 text-xs focus:border-brand-500 outline-none placeholder-slate-400" placeholder="Obs..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
+                <input type="text" class="w-full sm:w-32 border border-slate-200 rounded-lg px-2 py-2 sm:py-1.5 text-xs focus:border-brand-500 outline-none placeholder-slate-400" placeholder="Obs..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
               </div>
             </div>`;
         }).join("");
 
         return `
-          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:border-brand-200 transition-colors">
-            <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-4">
-              <div class="flex items-center gap-3 w-full">
-                <div class="w-12 h-12 rounded-xl bg-navy-50 flex items-center justify-center text-brand-600 text-2xl border border-navy-100 shrink-0"><i class="ph-duotone ${iconClass}"></i></div>
+          <div class="bg-white border border-slate-200 rounded-[1.25rem] sm:rounded-2xl p-3.5 sm:p-4 shadow-sm hover:border-brand-200 transition-colors">
+            <div class="flex flex-row justify-between items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div class="flex items-start sm:items-center gap-3 w-full min-w-0">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-navy-50 flex items-center justify-center text-brand-600 text-xl sm:text-2xl border border-navy-100 shrink-0 mt-1 sm:mt-0"><i class="ph-duotone ${iconClass}"></i></div>
                 <div class="w-full flex-1 min-w-0">
-                  <div class="flex items-center gap-1 mb-0.5 w-full">
-                    <input type="text" value="${escapeHTML(item.tipo)}" class="inline-edit font-black text-navy-800 text-sm sm:text-base truncate max-w-[120px] sm:max-w-[200px]" onchange="updateEquipmentField('${item.id}', 'tipo', this.value)">
+                  <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-0.5 w-full">
+                    <input type="text" value="${escapeHTML(item.tipo)}" class="inline-edit font-black text-navy-800 text-sm sm:text-base truncate min-w-[100px] max-w-full sm:max-w-[200px]" onchange="updateEquipmentField('${item.id}', 'tipo', this.value)">
                     <div class="flex items-center bg-brand-50 text-brand-700 rounded-md px-1.5 py-0.5 shrink-0 border border-brand-100">
-                       <i class="ph-bold ph-barcode text-[10px] mr-1"></i>
-                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-[10px] sm:text-xs font-bold w-12 sm:w-16 outline-none" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
+                       <i class="ph-bold ph-barcode text-[9px] sm:text-[10px] mr-1"></i>
+                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-[9px] sm:text-xs font-bold w-12 sm:w-16 outline-none" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
                     </div>
                   </div>
-                  <div class="flex items-center text-xs text-slate-500 w-full truncate">
-                    <i class="ph-fill ph-map-pin mr-1 text-slate-400"></i><input type="text" value="${escapeHTML(item.local)}" class="inline-edit flex-1 px-1 min-w-0 truncate" onchange="updateEquipmentField('${item.id}', 'local', this.value)">
+                  <div class="flex items-center text-[10px] sm:text-xs text-slate-500 w-full truncate mt-1 sm:mt-0">
+                    <i class="ph-fill ph-map-pin mr-1 text-slate-400 shrink-0"></i><input type="text" value="${escapeHTML(item.local)}" class="inline-edit flex-1 px-1 min-w-0 truncate" onchange="updateEquipmentField('${item.id}', 'local', this.value)">
                   </div>
                 </div>
               </div>
-              <button type="button" onclick="removeEquipment('${item.id}')" class="text-slate-400 hover:text-brand-600 bg-slate-50 p-2 rounded-lg ml-auto sm:ml-0 shrink-0"><i class="ph-bold ph-trash text-lg"></i></button>
+              <button type="button" onclick="removeEquipment('${item.id}')" class="text-slate-400 hover:text-brand-600 bg-slate-50 p-2 rounded-lg shrink-0"><i class="ph-bold ph-trash text-lg"></i></button>
             </div>
             <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
-              <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Verificações</div>
+              <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Verificações</div>
               <div class="divide-y divide-slate-100">${checksHtml}</div>
             </div>
           </div>`;
@@ -1053,7 +1057,7 @@ ${eqp}`;
         
         if (logoData) {
           document.querySelectorAll(".logo-preview-container").forEach(el => {
-            el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-12 object-contain" />`;
+            el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-10 sm:max-h-12 object-contain" />`;
           });
         }
       } catch (e) { console.error(e); }
@@ -1067,12 +1071,10 @@ ${eqp}`;
       
       loadLocal(); checkAuth(); renderList(); renderPrint();
 
-      // Registro do Service Worker para PWA (Instalação no celular)
+      // Registro do Service Worker PWA
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('PWA: Service Worker registrado.'))
-            .catch(err => console.log('PWA: Falha ao registrar Service Worker.', err));
+          navigator.serviceWorker.register('sw.js').catch(err => console.log('PWA SW Error:', err));
         });
       }
     });
