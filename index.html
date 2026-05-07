@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>CheckFire Pro | Inspeção e Relatórios SCI</title>
   
-  <!-- Configurações PWA (App Instalável) -->
+  <!-- Configurações PWA -->
   <meta name="theme-color" content="#1a2942" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -18,8 +18,27 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7493133044241177" crossorigin="anonymous"></script>
+
+  <!-- Proteção de Código Fonte -->
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', event => {
+      // Bloqueia F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C e Ctrl+U
+      if (event.keyCode === 123 || 
+         (event.ctrlKey && event.shiftKey && (event.keyCode === 73 || event.keyCode === 74 || event.keyCode === 67)) || 
+         (event.ctrlKey && event.keyCode === 85)) {
+        event.preventDefault(); return false;
+      }
+    });
+  </script>
+
   <!-- Ícones -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <!-- Biblioteca para Gerar PDF Real -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -53,21 +72,21 @@
     .segment-radio input[type="radio"] { display: none; }
     .segment-radio .segment-label { 
       display: flex; flex-direction: column; align-items: center; justify-content: center; 
-      padding: 10px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; 
-      color: #64748b; font-weight: 700; font-size: 11px; text-align: center; cursor: pointer; transition: all 0.2s;
+      padding: 12px 10px; border-radius: 16px; border: 2px solid #e2e8f0; background: #f8fafc; 
+      color: #64748b; font-weight: 700; font-size: 12px; text-align: center; cursor: pointer; transition: all 0.2s;
     }
     .segment-radio input[type="radio"]:checked + .segment-label {
-      border-color: #1a2942; background: #f8fafc; color: #1a2942; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      border-color: #1a2942; background: white; color: #1a2942; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.08);
     }
     .segment-radio input[type="radio"]:checked + .segment-label i { color: #d90429; }
 
     /* Inputs invisíveis editáveis in-line */
-    .inline-edit { background: transparent; border: 1px dashed transparent; width: 100%; transition: all 0.2s; text-overflow: ellipsis; outline: none; }
-    .inline-edit:hover { border-color: #cbd5e1; background: #f8fafc; border-radius: 4px; }
-    .inline-edit:focus { border-color: #d90429; background: white; border-radius: 4px; box-shadow: 0 0 0 2px rgba(217, 4, 41, 0.2); }
+    .inline-edit { background: transparent; border: 2px dashed transparent; width: 100%; transition: all 0.2s; text-overflow: ellipsis; outline: none; padding: 2px 4px; border-radius: 6px; }
+    .inline-edit:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .inline-edit:focus { border-color: #d90429; background: white; border-style: solid; box-shadow: 0 0 0 3px rgba(217, 4, 41, 0.1); }
 
     /* Componentes App Native */
-    .app-main-container { padding-bottom: 90px; }
+    .app-main-container { padding-bottom: 100px; }
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -128,8 +147,14 @@
 
     /* Toast Notifications */
     #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; width: 90%; max-width: 320px; }
-    .toast { background: #1a2942; color: white; padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+    .toast { background: #1a2942; color: white; padding: 14px 18px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
     .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Estilos base das caixas de diálogo e inputs refinados */
+    .dialog-box { @apply bg-white border-2 border-slate-200 rounded-3xl p-5 sm:p-7 shadow-sm transition-all; }
+    .dialog-header { @apply text-base sm:text-lg font-black text-navy-800 mb-4 sm:mb-5 flex items-center gap-2 border-b-2 border-slate-100 pb-3 sm:pb-4; }
+    .input-standard { @apply w-full border-2 border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-sm font-medium text-slate-800 bg-slate-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 transition-all; }
+    .label-standard { @apply block text-[11px] sm:text-xs font-black text-navy-700 uppercase tracking-wider mb-1.5 sm:mb-2 ml-1; }
 
     @media print {
       body { background: white; }
@@ -138,9 +163,7 @@
     }
     
     @media screen {
-      .print-page { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-radius: 8px; border: 1px solid #e2e8f0; }
-      .input-standard { @apply w-full border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600 transition-shadow shadow-sm; }
-      .label-standard { @apply block text-xs font-bold text-navy-800 uppercase tracking-wide mb-1.5; }
+      .print-page { box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); border-radius: 4px; border: 1px solid #cbd5e1; }
       .nav-item { @apply flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-navy-800 transition-colors gap-1; }
       .nav-item.active { @apply text-navy-800 font-bold; }
       .nav-item.active i { @apply text-brand-600 drop-shadow-sm; }
@@ -150,6 +173,28 @@
 <body class="text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900 flex flex-col h-screen overflow-hidden">
 
   <div id="toast-container"></div>
+
+  <!-- Modal de Doação (20 Minutos) -->
+  <div id="donation-modal" class="fixed inset-0 z-[9999] bg-navy-900/80 backdrop-blur-sm hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl transform scale-95 transition-transform duration-300 relative" id="donation-modal-content">
+      <button onclick="closeDonationModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full p-1.5 transition-colors">
+        <i class="ph-bold ph-x text-lg"></i>
+      </button>
+      <div class="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 border border-rose-100 shadow-sm">
+        <i class="ph-fill ph-heart"></i>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-black text-center text-navy-800 mb-2">Gostando do CheckFire?</h2>
+      <p class="text-center text-sm text-slate-600 mb-6 font-medium leading-relaxed">
+        Notamos que você está usando o sistema há algum tempo! O CheckFire é gratuito. Considere fazer uma pequena doação para nos ajudar a mantê-lo operante e trazer novas ferramentas.
+      </p>
+      <a href="https://link.mercadopago.com.br/nrexpert" target="_blank" onclick="closeDonationModal()" class="w-full flex items-center justify-center gap-2 bg-rose-500 text-white font-bold rounded-xl py-3.5 hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/30 active:scale-95 mb-3">
+        <i class="ph-bold ph-hand-coins text-lg"></i> Fazer uma Doação
+      </a>
+      <button onclick="closeDonationModal()" class="w-full bg-slate-100 text-slate-500 font-bold rounded-xl py-3.5 hover:bg-slate-200 transition-colors active:scale-95">
+        Agora não
+      </button>
+    </div>
+  </div>
 
   <!-- SVG Logo Oculto para reuso -->
   <svg class="hidden">
@@ -164,7 +209,7 @@
 
   <!-- ================= LANDING PAGE ================= -->
   <div id="view-landing" class="absolute inset-0 z-50 bg-slate-50 overflow-y-auto no-print flex flex-col">
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+    <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-10 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center gap-2 sm:gap-3">
           <svg class="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-md"><use href="#brand-shield"></use></svg>
@@ -173,71 +218,63 @@
             <span class="text-[8px] sm:text-[9px] font-bold tracking-widest text-slate-500 uppercase">Operacional SCI</span>
           </div>
         </div>
-        <button onclick="showLogin()" class="text-xs sm:text-sm font-bold text-navy-800 bg-slate-100 hover:bg-slate-200 px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition-colors">
-          Acessar <span class="hidden sm:inline">Sistema</span>
+        <button onclick="showApp()" class="text-xs sm:text-sm font-black text-white bg-navy-800 hover:bg-navy-900 px-4 py-2.5 sm:px-5 sm:py-2.5 rounded-xl transition-all shadow-md active:scale-95">
+          Acessar Sistema
         </button>
       </div>
     </header>
 
     <section class="flex-1 flex flex-col items-center justify-center px-4 py-10 sm:py-20 text-center max-w-4xl mx-auto">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-[10px] sm:text-xs font-bold mb-4 sm:mb-6">
-        <i class="ph-fill ph-star"></i> O melhor SaaS para Bombeiros Civis
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 border border-brand-100 text-brand-700 text-[10px] sm:text-xs font-bold mb-4 sm:mb-6 shadow-sm">
+        <i class="ph-fill ph-star text-brand-500"></i> O melhor SaaS para Bombeiros Civis
       </div>
       <h1 class="text-3xl sm:text-6xl font-black text-navy-800 tracking-tight leading-tight mb-4 sm:mb-6">
         A tecnologia chegou às <span class="text-brand-600">Inspeções e Ocorrências</span>
       </h1>
-      <p class="text-base sm:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl leading-relaxed">
-        Gere checklists digitais e relatórios (ROE/RAA/RPI) padronizados em PDF com a sua logo ou formatados diretamente para o WhatsApp.
+      <p class="text-base sm:text-xl text-slate-500 mb-8 sm:mb-10 max-w-2xl leading-relaxed font-medium">
+        Gere checklists digitais e relatórios (ROE/RAA/RPI) padronizados em PDF com a sua logo ou formatados diretamente para o WhatsApp. Gratuito e fácil de usar.
       </p>
       
-      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-        <a href="https://mpago.la/2Xkmxe6" target="_blank" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-6 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-brand-700 transition-all shadow-xl shadow-brand-600/30">
-          <i class="ph-bold ph-shopping-cart"></i> Assinar Acesso (R$ 14,90)
-        </a>
-        <a href="https://wa.me/5571992756180" target="_blank" class="flex items-center justify-center gap-2 bg-white text-navy-800 border-2 border-slate-200 px-6 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-slate-50 hover:border-slate-300 transition-all">
-          <i class="ph-fill ph-whatsapp-logo text-green-500 text-2xl"></i> Dúvidas?
+      <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <button onclick="showApp()" class="flex items-center justify-center gap-2 bg-brand-600 text-white px-6 py-4 rounded-2xl font-black text-base sm:text-lg hover:bg-brand-700 transition-all shadow-xl shadow-brand-600/30 active:scale-95">
+          <i class="ph-bold ph-rocket-launch text-xl"></i> Acessar Sistema
+        </button>
+        <a href="https://wa.me/5571992756180" target="_blank" class="flex items-center justify-center gap-2 bg-white text-navy-800 border-2 border-slate-200 px-6 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 shadow-sm">
+          <i class="ph-fill ph-whatsapp-logo text-green-500 text-2xl"></i> Suporte/Dúvidas
         </a>
       </div>
 
-      <div class="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-left border-t border-slate-200 pt-10 sm:pt-16 w-full">
-        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-navy-50 text-navy-700 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4"><i class="ph-duotone ph-list-checks"></i></div>
-          <h3 class="font-bold text-navy-800 mb-1 sm:mb-2 text-sm sm:text-base">Checklists em Prancheta</h3>
-          <p class="text-xs sm:text-sm text-slate-500">Crie listas de verificação personalizadas, insira a sua logo e imprima o formulário perfeito em A4.</p>
+      <!-- Área de Doação / Apoio -->
+      <div class="mt-10 bg-rose-50 border-2 border-rose-100 rounded-3xl p-6 sm:p-8 max-w-lg mx-auto w-full text-center shadow-sm">
+        <h3 class="text-rose-800 font-black text-base sm:text-lg mb-2 flex items-center justify-center gap-2">
+          <i class="ph-fill ph-heart text-rose-500"></i> Apoie o CheckFire Pro
+        </h3>
+        <p class="text-sm text-rose-600/80 mb-5 leading-relaxed font-medium">
+          O CheckFire é gratuito! Se a ferramenta ajudou no seu dia a dia, considere fazer uma doação para manter o sistema operante e sem anúncios invasivos.
+        </p>
+        <a href="https://link.mercadopago.com.br/nrexpert" target="_blank" class="inline-flex items-center justify-center gap-2 bg-rose-500 text-white px-6 py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/30 active:scale-95">
+          <i class="ph-bold ph-hand-coins text-lg"></i> Fazer uma Doação
+        </a>
+      </div>
+
+      <div class="mt-10 sm:mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 text-left border-t-2 border-slate-200 pt-10 sm:pt-16 w-full">
+        <div class="dialog-box hover:border-navy-200">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 bg-navy-50 text-navy-700 rounded-2xl flex items-center justify-center text-2xl mb-5 border border-navy-100"><i class="ph-duotone ph-list-checks"></i></div>
+          <h3 class="font-black text-navy-800 mb-2 text-base sm:text-lg">Checklists em Prancheta</h3>
+          <p class="text-sm text-slate-500 font-medium">Crie listas de verificação personalizadas, insira a sua logo e imprima o formulário perfeito em A4.</p>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4"><i class="ph-duotone ph-warning-octagon"></i></div>
-          <h3 class="font-bold text-navy-800 mb-1 sm:mb-2 text-sm sm:text-base">Relatórios Oficiais</h3>
-          <p class="text-xs sm:text-sm text-slate-500">Gere ROE (Ocorrências), RAA (Acompanhamento) e RPI (Prevenção) no padrão NBR.</p>
+        <div class="dialog-box hover:border-brand-200">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center text-2xl mb-5 border border-brand-100"><i class="ph-duotone ph-warning-octagon"></i></div>
+          <h3 class="font-black text-navy-800 mb-2 text-base sm:text-lg">Relatórios Oficiais</h3>
+          <p class="text-sm text-slate-500 font-medium">Gere ROE (Ocorrências), RAA (Acompanhamento) e RPI (Prevenção) no padrão NBR.</p>
         </div>
-        <div class="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-100">
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-4"><i class="ph-duotone ph-whatsapp-logo"></i></div>
-          <h3 class="font-bold text-navy-800 mb-1 sm:mb-2 text-sm sm:text-base">Automação WhatsApp</h3>
-          <p class="text-xs sm:text-sm text-slate-500">Com um clique, os dados viram um relatório formatado com emojis e negrito para colar no grupo.</p>
+        <div class="dialog-box hover:border-green-200">
+          <div class="w-12 h-12 sm:w-14 sm:h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-2xl mb-5 border border-green-100"><i class="ph-duotone ph-whatsapp-logo"></i></div>
+          <h3 class="font-black text-navy-800 mb-2 text-base sm:text-lg">Automação WhatsApp</h3>
+          <p class="text-sm text-slate-500 font-medium">Com um clique, os dados viram um relatório formatado com emojis e negrito para colar no grupo.</p>
         </div>
       </div>
     </section>
-  </div>
-
-  <!-- ================= TELA DE LOGIN ================= -->
-  <div id="view-login" class="absolute inset-0 z-50 bg-navy-900 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl">
-      <svg class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 drop-shadow-md"><use href="#brand-shield"></use></svg>
-      <h2 class="text-xl sm:text-2xl font-black text-center text-navy-800 mb-2">Área Restrita</h2>
-      <p class="text-center text-xs sm:text-sm text-slate-500 mb-6 sm:mb-8">Digite sua senha para acessar o painel operacional.</p>
-      
-      <form onsubmit="handleLogin(event)">
-        <label class="label-standard">Senha de Acesso</label>
-        <input type="password" id="loginPassword" class="input-standard mb-5 sm:mb-6 text-center text-lg sm:text-xl tracking-widest" placeholder="••••••••" required />
-        
-        <button type="submit" class="w-full bg-brand-600 text-white font-bold rounded-xl py-3.5 sm:py-4 hover:bg-brand-700 transition-colors shadow-lg shadow-brand-600/30">
-          Entrar no Sistema
-        </button>
-        <button type="button" onclick="showLanding()" class="w-full mt-2 sm:mt-3 bg-transparent text-slate-500 font-bold rounded-xl py-3 hover:bg-slate-50 transition-colors">
-          Voltar
-        </button>
-      </form>
-    </div>
   </div>
 
 
@@ -249,19 +286,19 @@
         <div class="flex items-center gap-2 sm:gap-3">
           <svg class="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-lg"><use href="#brand-shield"></use></svg>
           <div>
-            <h1 class="text-base sm:text-xl font-bold tracking-tight text-white leading-tight">Check<span class="text-brand-500">Fire</span></h1>
+            <h1 class="text-base sm:text-xl font-black tracking-tight text-white leading-tight">Check<span class="text-brand-500">Fire</span></h1>
             <p class="text-slate-400 text-[8px] sm:text-[10px] uppercase tracking-widest font-bold">Painel Operacional</p>
           </div>
         </div>
-        <div class="flex gap-1.5 sm:gap-2">
-          <button type="button" onclick="triggerPrint()" class="flex items-center justify-center gap-1 sm:gap-2 bg-brand-600 text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold text-xs sm:text-sm hover:bg-brand-700 transition-all shadow-md active:scale-95">
-            <i class="ph-bold ph-printer text-base sm:text-lg"></i> <span class="hidden sm:inline">PDF</span>
+        <div class="flex gap-2 items-center">
+          <a href="https://link.mercadopago.com.br/nrexpert" target="_blank" class="flex items-center justify-center gap-1.5 sm:gap-2 bg-rose-500 text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold text-[10px] sm:text-sm hover:bg-rose-600 transition-all shadow-md active:scale-95" title="Apoiar Projeto">
+            <i class="ph-fill ph-heart text-sm sm:text-lg"></i> <span class="hidden sm:inline">Apoiar</span>
+          </a>
+          <button type="button" onclick="downloadPDF()" class="flex items-center justify-center gap-1.5 sm:gap-2 bg-brand-600 text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold text-[10px] sm:text-sm hover:bg-brand-700 transition-all shadow-md active:scale-95">
+            <i class="ph-bold ph-download-simple text-sm sm:text-lg"></i> <span class="hidden sm:inline">Baixar PDF</span>
           </button>
-          <button type="button" onclick="saveLocal()" class="flex items-center justify-center p-1.5 sm:p-2 sm:px-3 bg-navy-700 text-slate-200 rounded-lg hover:bg-navy-600 transition-all active:scale-95 border border-navy-600" title="Salvar Projeto">
-            <i class="ph-bold ph-floppy-disk text-base sm:text-lg"></i>
-          </button>
-          <button type="button" onclick="handleLogout()" class="flex items-center justify-center p-1.5 sm:p-2 bg-navy-700 text-red-400 rounded-lg hover:bg-brand-600 hover:text-white transition-all border border-navy-600" title="Sair do Sistema">
-            <i class="ph-bold ph-sign-out text-base sm:text-lg"></i>
+          <button type="button" onclick="handleLogout()" class="flex items-center justify-center p-1.5 sm:p-2 sm:px-3 bg-navy-700 text-red-400 rounded-lg hover:bg-navy-600 hover:text-white transition-all border border-navy-600" title="Voltar ao Início">
+            <i class="ph-bold ph-sign-out text-sm sm:text-lg"></i>
           </button>
         </div>
       </div>
@@ -275,36 +312,36 @@
         <div id="tab-inspecao" class="tab-content active">
           <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 xl:gap-8">
             
-            <!-- Coluna 1: Cabeçalho do Formulário -->
+            <!-- Coluna 1: Configurações -->
             <div class="xl:col-span-4 flex flex-col gap-5 sm:gap-6">
               
-              <!-- Bloco: Configurações do Documento (A4) -->
-              <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200">
-                <h2 class="text-base sm:text-lg font-bold text-navy-800 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 sm:pb-3">
-                  <i class="ph-duotone ph-file-dashed text-brand-600 text-lg sm:text-xl"></i> Formato de Impressão
+              <!-- Bloco: Formato de Impressão -->
+              <div class="dialog-box">
+                <h2 class="dialog-header">
+                  <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100"><i class="ph-duotone ph-file-dashed text-xl"></i></div>
+                  Formato A4 (Impressão)
                 </h2>
-                <div class="space-y-3 sm:space-y-4">
+                <div class="space-y-4">
                   <div>
                     <label class="label-standard">Logo do Relatório (Empresa/Cliente)</label>
-                    <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-xs sm:text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-navy-50 file:text-navy-700 file:font-bold hover:file:bg-navy-100 cursor-pointer w-full mb-2" />
-                    <div class="h-14 sm:h-16 border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 text-slate-400 text-[10px] sm:text-xs logo-preview-container">
-                      Logo do Relatório
+                    <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-navy-50 file:text-navy-700 file:font-bold hover:file:bg-navy-100 cursor-pointer w-full mb-3" />
+                    <div class="h-16 border-2 border-slate-200 rounded-xl flex items-center justify-center overflow-hidden bg-slate-50 text-slate-400 text-[10px] sm:text-xs logo-preview-container shadow-inner">
+                      <img src="logo.png" alt="Logo Padrão" class="max-h-12 object-contain p-1" onerror="this.style.display='none'; this.parentNode.innerHTML='Sem Logo'" />
                     </div>
                   </div>
 
-                  <!-- Ajuste Mobile: 3 colunas em telas pequenas podem ficar apertadas, mas usando text-xs funciona. -->
-                  <div class="grid grid-cols-3 gap-2">
+                  <div class="grid grid-cols-3 gap-3">
                     <div>
                       <label for="codigo" class="label-standard truncate">Código</label>
-                      <input id="codigo" class="input-standard !px-1 sm:!px-2 text-center text-xs sm:text-sm" value="FR-001" oninput="renderPrint()" />
+                      <input id="codigo" class="input-standard text-center" value="FR-001" oninput="renderPrint()" />
                     </div>
                     <div>
                       <label for="versao" class="label-standard truncate">Versão</label>
-                      <input id="versao" class="input-standard !px-1 sm:!px-2 text-center text-xs sm:text-sm" value="Rev.00" oninput="renderPrint()" />
+                      <input id="versao" class="input-standard text-center" value="Rev.00" oninput="renderPrint()" />
                     </div>
                     <div>
                       <label for="periodicidade" class="label-standard truncate">Período</label>
-                      <select id="periodicidade" class="input-standard !px-1 sm:!px-2 text-xs sm:text-sm" onchange="renderPrint()">
+                      <select id="periodicidade" class="input-standard" onchange="renderPrint()">
                         <option>Mensal</option><option>Semanal</option><option>Anual</option>
                       </select>
                     </div>
@@ -312,81 +349,99 @@
                 </div>
               </div>
 
-              <!-- Bloco: Dados da Inspeção -->
-              <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200">
-                <h2 class="text-base sm:text-lg font-bold text-navy-800 mb-3 sm:mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 sm:pb-3">
-                  <i class="ph-duotone ph-buildings text-brand-600 text-lg sm:text-xl"></i> Dados do Cliente
+              <!-- Bloco: Dados do Cliente -->
+              <div class="dialog-box">
+                <h2 class="dialog-header">
+                  <div class="w-8 h-8 rounded-lg bg-navy-50 text-navy-700 flex items-center justify-center border border-navy-100"><i class="ph-duotone ph-buildings text-xl"></i></div>
+                  Dados do Cliente
                 </h2>
-                <div class="space-y-3 sm:space-y-4">
+                <div class="space-y-4">
                   <div>
-                    <label for="tituloRelatorio" class="label-standard">Título do Relatório</label>
-                    <input id="tituloRelatorio" class="input-standard text-sm" value="Auditoria de Sistemas de Combate a Incêndio" oninput="renderPrint()" />
+                    <label for="tituloRelatorio" class="label-standard">Título do Documento</label>
+                    <input id="tituloRelatorio" class="input-standard" value="Auditoria de Sistemas de Combate a Incêndio" oninput="renderPrint()" />
                   </div>
                   <div>
-                    <label for="empresa" class="label-standard">Empresa / Cliente</label>
-                    <input id="empresa" class="input-standard text-sm" placeholder="Ex.: Condomínio Comercial..." oninput="renderPrint()" />
+                    <label for="empresa" class="label-standard">Nome da Empresa / Cliente</label>
+                    <input id="empresa" class="input-standard" placeholder="Ex.: Condomínio Comercial..." oninput="renderPrint()" />
                   </div>
                   <div>
                     <label for="endereco" class="label-standard">Endereço Completo</label>
-                    <input id="endereco" class="input-standard text-sm" placeholder="Rua, número, cidade/UF..." oninput="renderPrint()" />
+                    <input id="endereco" class="input-standard" placeholder="Rua, número, cidade/UF..." oninput="renderPrint()" />
                   </div>
-                  <!-- Ajuste Mobile: 1 coluna no celular, 2 no PC -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label for="setor" class="label-standard">Setor/Área</label>
-                      <input id="setor" class="input-standard text-sm" placeholder="Ex.: Bloco A" oninput="renderPrint()" />
+                      <label for="setor" class="label-standard">Setor / Área Auditada</label>
+                      <input id="setor" class="input-standard" placeholder="Ex.: Bloco A" oninput="renderPrint()" />
                     </div>
                     <div>
-                      <label for="data" class="label-standard">Data</label>
-                      <input type="date" id="data" class="input-standard text-sm" oninput="renderPrint()" />
+                      <label for="data" class="label-standard">Data da Inspeção</label>
+                      <input type="date" id="data" class="input-standard" oninput="renderPrint()" />
                     </div>
                   </div>
                   <div>
-                    <label for="responsavel" class="label-standard">Inspetor(a) (Bombeiro Civil)</label>
-                    <input id="responsavel" class="input-standard text-sm" placeholder="Nome do responsável" oninput="renderPrint()" />
+                    <label for="responsavel" class="label-standard">Nome do Inspetor(a)</label>
+                    <input id="responsavel" class="input-standard" placeholder="Bombeiro Civil responsável" oninput="renderPrint()" />
                   </div>
-                  
-                  <div class="h-px bg-slate-200 my-3 sm:my-4"></div>
-                  
+                </div>
+              </div>
+
+              <!-- Bloco: Adicionar Equipamento -->
+              <div class="bg-slate-100 rounded-3xl p-5 sm:p-7 border-2 border-slate-200">
+                <h2 class="text-base sm:text-lg font-black text-navy-800 mb-4 flex items-center gap-2 border-b-2 border-slate-200 pb-3">
+                  <div class="w-8 h-8 rounded-lg bg-white text-brand-600 flex items-center justify-center border border-slate-200 shadow-sm"><i class="ph-bold ph-plus text-xl"></i></div>
+                  Adicionar Item
+                </h2>
+                <div class="space-y-4">
                   <div>
-                    <label for="manualTipo" class="label-standard">Adicionar Equipamento</label>
-                    <select id="manualTipo" class="input-standard mb-3 font-semibold text-navy-800 text-sm">
+                    <label for="manualTipo" class="label-standard">Selecione o Sistema</label>
+                    <select id="manualTipo" class="input-standard bg-white">
                       <option>Extintor</option><option>Hidrante</option><option>Porta de Emergência</option>
                       <option>Iluminação de Emergência</option><option>Alarme de Incêndio</option>
                       <option>Sinalização de Emergência</option><option>Sprinkler</option>
                       <option>Bomba de Incêndio</option><option>Detector de Fumaça</option><option>Outro</option>
                     </select>
-                    <!-- Ajuste Mobile: 1 coluna no celular para não ficar apertado -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                      <input id="manualPatrimonio" class="input-standard text-sm" placeholder="ID/Patrimônio" />
-                      <input id="manualLocal" class="input-standard text-sm" placeholder="Localização" />
-                    </div>
-                    <button type="button" onclick="addEquipment()" class="w-full flex items-center justify-center gap-2 bg-navy-800 text-white px-4 py-3 sm:py-3.5 rounded-xl font-bold text-sm hover:bg-navy-900 transition-all active:scale-[0.98] shadow-md">
-                      <i class="ph-bold ph-plus"></i> Inserir no Formulário
-                    </button>
                   </div>
-
-                  <button type="button" onclick="resetAnswers()" class="w-full mt-2 flex items-center justify-center gap-2 bg-white text-slate-700 border-2 border-slate-200 px-4 py-3 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-50 transition-all">
-                    <i class="ph-bold ph-eraser text-base sm:text-lg text-slate-400"></i> Preparar p/ Prancheta (Limpar)
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label for="manualPatrimonio" class="label-standard">ID / Patrimônio</label>
+                      <input id="manualPatrimonio" class="input-standard bg-white" placeholder="Ex: EXT-01" />
+                    </div>
+                    <div>
+                      <label for="manualLocal" class="label-standard">Local Específico</label>
+                      <input id="manualLocal" class="input-standard bg-white" placeholder="Ex: Recepção" />
+                    </div>
+                  </div>
+                  <button type="button" onclick="addEquipment()" class="w-full flex items-center justify-center gap-2 bg-navy-800 text-white px-4 py-4 rounded-xl font-black text-sm hover:bg-navy-900 transition-all active:scale-[0.98] shadow-md mt-2">
+                    <i class="ph-bold ph-arrow-right"></i> Inserir no Formulário
                   </button>
                 </div>
               </div>
+
             </div>
 
             <!-- Coluna 2: Formulário Digital Gerado -->
             <div class="xl:col-span-8">
-              <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200 min-h-full">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 sm:mb-4 border-b border-slate-100 pb-3">
-                  <h2 class="text-lg sm:text-xl font-bold text-navy-800 flex items-center gap-2">
-                    <i class="ph-duotone ph-list-numbers text-brand-600"></i> Estrutura do Formulário
+              <div class="dialog-box min-h-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b-2 border-slate-100 pb-4">
+                  <h2 class="text-lg sm:text-xl font-black text-navy-800 flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center border border-brand-100"><i class="ph-duotone ph-list-numbers text-xl"></i></div>
+                    Estrutura do Formulário
                   </h2>
-                  <button type="button" onclick="addExtintorAreaExample()" class="text-xs bg-brand-50 text-brand-700 px-3 py-2 rounded-lg font-bold hover:bg-brand-100 border border-brand-200 transition-colors self-start sm:self-auto">
-                    <i class="ph-bold ph-magic-wand"></i> Inserir Exemplo
-                  </button>
+                  <div class="flex gap-2">
+                    <button type="button" onclick="addExtintorAreaExample()" class="text-xs bg-slate-100 text-navy-700 px-3 py-2 rounded-lg font-bold hover:bg-slate-200 border border-slate-200 transition-colors">
+                      <i class="ph-bold ph-magic-wand"></i> Exemplo
+                    </button>
+                    <button type="button" onclick="resetAnswers()" class="text-xs bg-white text-brand-600 px-3 py-2 rounded-lg font-bold hover:bg-brand-50 border border-brand-200 transition-colors" title="Limpar respostas para usar em prancheta">
+                      <i class="ph-bold ph-eraser"></i> Limpar (Zerar)
+                    </button>
+                  </div>
                 </div>
-                <p class="text-[11px] sm:text-xs text-slate-500 mb-5 sm:mb-6">Clique nos textos (pergunta, local) para editar in-line. Deixe as marcações (C/NC/NA) em branco caso vá imprimir a folha A4 e preencher à mão.</p>
                 
-                <div id="equipmentList" class="flex flex-col gap-4 sm:gap-5">
+                <p class="text-xs text-slate-500 mb-6 font-medium bg-slate-50 p-3 rounded-lg border border-slate-200">
+                  <i class="ph-fill ph-info text-blue-500 mr-1"></i> Clique nos textos (pergunta, local) para editar. Deixe as marcações (C/NC/NA) em branco caso vá imprimir a folha A4 e preencher à mão.
+                </p>
+                
+                <div id="equipmentList" class="flex flex-col gap-5 sm:gap-6">
                   <!-- Injetado via JS -->
                 </div>
               </div>
@@ -397,124 +452,130 @@
         <!-- ================= ABA 2: RELATÓRIOS (OCORRÊNCIA / ACOMPANHAMENTO) ================= -->
         <div id="tab-relatorios" class="tab-content">
           <div class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-8 shadow-sm border border-slate-200">
-              <div class="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6 border-b border-slate-100 pb-4 sm:pb-5">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-navy-50 text-navy-700 flex items-center justify-center text-2xl sm:text-3xl border border-navy-100 shrink-0">
+            <div class="dialog-box">
+              <div class="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 border-b-2 border-slate-100 pb-5 sm:pb-6">
+                <div class="w-14 h-14 rounded-2xl bg-navy-50 text-navy-700 flex items-center justify-center text-3xl border border-navy-100 shrink-0 shadow-sm">
                   <i class="ph-duotone ph-files"></i>
                 </div>
                 <div>
-                  <h2 class="text-xl sm:text-2xl font-bold text-navy-800 leading-tight">Relatórios Operacionais</h2>
-                  <p class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">Gere relatórios oficias no padrão NBR.</p>
+                  <h2 class="text-xl sm:text-2xl font-black text-navy-800 leading-tight">Relatórios Operacionais</h2>
+                  <p class="text-sm text-slate-500 mt-1 font-medium">Gere relatórios oficias no padrão NBR do Bombeiro Civil.</p>
                 </div>
               </div>
 
-              <div class="space-y-5 sm:space-y-6">
+              <div class="space-y-6 sm:space-y-8">
                 <!-- LOGO UPLOAD PARA RELATÓRIOS -->
-                <div class="bg-slate-50 border border-slate-200 p-3 sm:p-4 rounded-xl">
+                <div class="bg-slate-50 border-2 border-slate-200 p-4 sm:p-5 rounded-2xl">
                   <label class="label-standard">Logo do Relatório (Sua Empresa/Cliente)</label>
-                  <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-xs sm:text-sm text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-navy-100 file:text-navy-700 file:font-bold hover:file:bg-navy-200 cursor-pointer w-full mb-2" />
-                  <div class="h-14 sm:h-16 border border-slate-300 rounded-xl flex items-center justify-center overflow-hidden bg-white text-slate-400 text-[10px] sm:text-xs logo-preview-container">
-                    Logo do Relatório
+                  <input type="file" accept="image/*" onchange="loadLogo(event)" class="text-xs sm:text-sm text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-white file:text-navy-700 file:font-bold hover:file:bg-slate-100 cursor-pointer w-full mb-3" />
+                  <div class="h-16 border-2 border-slate-200 rounded-xl flex items-center justify-center overflow-hidden bg-white text-slate-400 text-xs logo-preview-container shadow-inner">
+                    <img src="logo.png" alt="Logo Padrão" class="max-h-12 object-contain p-1" onerror="this.style.display='none'; this.parentNode.innerHTML='Sem Logo'" />
                   </div>
                 </div>
 
                 <!-- SELETOR PRINCIPAL DO TIPO DE RELATÓRIO (SEGMENT CONTROL) -->
-                <div class="mb-5 sm:mb-6">
-                  <label class="label-standard text-navy-800 mb-2 sm:mb-3 text-center sm:text-left"><i class="ph-bold ph-tag"></i> Tipo de Relatório a ser gerado</label>
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                <div>
+                  <label class="label-standard text-center sm:text-left"><i class="ph-bold ph-tag"></i> Selecione a Categoria do Relatório</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <label class="segment-radio">
                       <input type="radio" name="rel_categoria" value="RAA" checked onchange="renderPrint()">
-                      <div class="segment-label !py-2 sm:!py-3">
-                        <i class="ph-duotone ph-clipboard-text text-lg sm:text-xl mb-1"></i>
+                      <div class="segment-label">
+                        <i class="ph-duotone ph-clipboard-text text-xl sm:text-2xl mb-2"></i>
                         Acompanhamento (RAA)
                       </div>
                     </label>
                     <label class="segment-radio">
                       <input type="radio" name="rel_categoria" value="ROE" onchange="renderPrint()">
-                      <div class="segment-label !py-2 sm:!py-3">
-                        <i class="ph-duotone ph-warning-octagon text-lg sm:text-xl mb-1"></i>
+                      <div class="segment-label">
+                        <i class="ph-duotone ph-warning-octagon text-xl sm:text-2xl mb-2"></i>
                         Ocorrência (ROE)
                       </div>
                     </label>
                     <label class="segment-radio">
                       <input type="radio" name="rel_categoria" value="RPI" onchange="renderPrint()">
-                      <div class="segment-label !py-2 sm:!py-3">
-                        <i class="ph-duotone ph-shield-check text-lg sm:text-xl mb-1"></i>
+                      <div class="segment-label">
+                        <i class="ph-duotone ph-shield-check text-xl sm:text-2xl mb-2"></i>
                         Prevenção (RPI)
                       </div>
                     </label>
                   </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <div class="bg-slate-100 h-px w-full"></div> <!-- Divisória -->
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label class="label-standard">Natureza / Atividade</label>
-                    <input id="occ_tipo" class="input-standard text-sm" placeholder="Ex: Liberação de PT, Princípio de Incêndio..." oninput="renderPrint()" />
+                    <input id="occ_tipo" class="input-standard" placeholder="Ex: Liberação de PT, Princípio de Incêndio..." oninput="renderPrint()" />
                   </div>
                   <div>
-                    <label class="label-standard">Solicitante / Setor</label>
-                    <input id="occ_solicitante" class="input-standard text-sm" placeholder="Ex: Manutenção Elétrica..." oninput="renderPrint()" />
+                    <label class="label-standard">Solicitante / Setor Envolvido</label>
+                    <input id="occ_solicitante" class="input-standard" placeholder="Ex: Manutenção Elétrica..." oninput="renderPrint()" />
                   </div>
                 </div>
 
-                <!-- Ajuste Mobile: Datas em 1 col, horas em 2 cols -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
                   <div class="col-span-2 sm:col-span-1">
-                    <label class="label-standard">Data</label>
-                    <input type="date" id="occ_data" class="input-standard text-sm" oninput="renderPrint()" />
+                    <label class="label-standard">Data da Ação</label>
+                    <input type="date" id="occ_data" class="input-standard" oninput="renderPrint()" />
                   </div>
                   <div class="col-span-1">
                     <label class="label-standard truncate">Hora Início</label>
-                    <input type="time" id="occ_hora_inicio" class="input-standard text-sm !px-2" oninput="renderPrint()" />
+                    <input type="time" id="occ_hora_inicio" class="input-standard !px-2 text-center" oninput="renderPrint()" />
                   </div>
                   <div class="col-span-1">
                     <label class="label-standard truncate">Chegada</label>
-                    <input type="time" id="occ_hora_chegada" class="input-standard text-sm !px-2" oninput="renderPrint()" />
+                    <input type="time" id="occ_hora_chegada" class="input-standard !px-2 text-center" oninput="renderPrint()" />
                   </div>
                   <div class="col-span-2 sm:col-span-1">
                     <label class="label-standard truncate">Hora Fim</label>
-                    <input type="time" id="occ_hora_fim" class="input-standard text-sm" oninput="renderPrint()" />
+                    <input type="time" id="occ_hora_fim" class="input-standard text-center" oninput="renderPrint()" />
                   </div>
                 </div>
 
                 <div>
-                  <label class="label-standard">Local Exato da Atividade / Ocorrência</label>
-                  <input id="occ_local" class="input-standard text-sm" placeholder="Ex: Galpão 3, Máquina de Solda B" oninput="renderPrint()" />
+                  <label class="label-standard">Localização Exata</label>
+                  <input id="occ_local" class="input-standard" placeholder="Ex: Galpão 3, Máquina de Solda B" oninput="renderPrint()" />
                 </div>
 
+                <div class="bg-slate-100 h-px w-full"></div> <!-- Divisória -->
+
                 <div>
-                  <label class="label-standard">1. Histórico e Relato do Fato</label>
-                  <textarea id="occ_historico" class="input-standard min-h-[90px] sm:min-h-[100px] text-sm" placeholder="Descreva a situação inicial, como a equipe encontrou a cena ou os detalhes da atividade..." oninput="renderPrint()"></textarea>
+                  <label class="label-standard">1. Histórico e Relato Inicial do Fato</label>
+                  <textarea id="occ_historico" class="input-standard min-h-[100px]" placeholder="Descreva a situação inicial, como a equipe encontrou a cena ou os detalhes da atividade a ser acompanhada..." oninput="renderPrint()"></textarea>
                 </div>
 
                 <div>
                   <label class="label-standard">2. Ações de Prevenção / Intervenção Realizadas</label>
-                  <textarea id="occ_acoes" class="input-standard min-h-[90px] sm:min-h-[100px] text-sm" placeholder="Quais procedimentos adotados? (Ex: Isolamento, uso de extintores, inspeção prévia...)" oninput="renderPrint()"></textarea>
+                  <textarea id="occ_acoes" class="input-standard min-h-[100px]" placeholder="Quais procedimentos foram adotados? (Ex: Isolamento, uso de extintores, inspeção prévia...)" oninput="renderPrint()"></textarea>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label class="label-standard">Materiais Utilizados</label>
-                    <textarea id="occ_materiais" class="input-standard min-h-[70px] sm:min-h-[90px] text-sm" placeholder="Ex: Fita zebrada, Rádio, Extintor..." oninput="renderPrint()"></textarea>
+                    <label class="label-standard">Materiais/Equipamentos Utilizados</label>
+                    <textarea id="occ_materiais" class="input-standard min-h-[100px]" placeholder="Ex: Fita zebrada, Rádio, Extintor PQS..." oninput="renderPrint()"></textarea>
                   </div>
                   <div>
                     <label class="label-standard">Houve Vítimas / Acidentes?</label>
-                    <select id="occ_vitimas" class="input-standard mb-2 sm:mb-3 text-sm" onchange="renderPrint()">
+                    <select id="occ_vitimas" class="input-standard mb-3" onchange="renderPrint()">
                       <option value="NÃO">Não / N/A</option>
                       <option value="SIM">Sim, com vítimas</option>
                     </select>
-                    <input id="occ_vitimas_desc" class="input-standard text-sm" placeholder="Se sim, descreva o estado/destino." oninput="renderPrint()" />
+                    <label class="label-standard">Descrição das Vítimas</label>
+                    <input id="occ_vitimas_desc" class="input-standard" placeholder="Se sim, descreva o estado/destino." oninput="renderPrint()" />
                   </div>
                 </div>
 
+                <div class="bg-slate-100 h-px w-full"></div> <!-- Divisória -->
+
                 <div>
                   <label class="label-standard">Conclusão / Situação Final</label>
-                  <input id="occ_conclusao" class="input-standard text-sm" placeholder="Ex: Atividade concluída sem alterações. Local seguro." oninput="renderPrint()" />
+                  <input id="occ_conclusao" class="input-standard" placeholder="Ex: Atividade concluída sem alterações. Local seguro." oninput="renderPrint()" />
                 </div>
 
                 <div>
                   <label class="label-standard">Equipe Empreendida (Bombeiros/Brigadistas)</label>
-                  <input id="occ_equipe" class="input-standard text-sm" placeholder="Nomes dos profissionais..." oninput="renderPrint()" />
+                  <input id="occ_equipe" class="input-standard" placeholder="Lista dos nomes dos profissionais atuantes..." oninput="renderPrint()" />
                 </div>
               </div>
             </div>
@@ -524,50 +585,57 @@
         <!-- ================= ABA 3: EXPORTAR WHATSAPP ================= -->
         <div id="tab-whatsapp" class="tab-content">
           <div class="max-w-2xl mx-auto">
-            <div class="bg-white rounded-[1.25rem] sm:rounded-3xl p-5 sm:p-8 shadow-sm border border-slate-200">
-              <div class="text-center mb-5 sm:mb-6">
-                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-2xl sm:text-3xl mx-auto mb-2 sm:mb-3">
+            <div class="dialog-box">
+              <div class="text-center mb-6 sm:mb-8">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-50 border-2 border-green-100 text-green-500 flex items-center justify-center text-3xl sm:text-4xl mx-auto mb-4 shadow-sm">
                   <i class="ph-fill ph-whatsapp-logo"></i>
                 </div>
-                <h2 class="text-lg sm:text-xl font-bold text-navy-800">Exportar para WhatsApp</h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">Gere um texto formatado pronto para enviar no grupo operacional.</p>
+                <h2 class="text-xl sm:text-2xl font-black text-navy-800">Exportação Automática</h2>
+                <p class="text-sm text-slate-500 mt-2 font-medium">Gere o texto formatado para copiar e colar rapidamente nos grupos.</p>
               </div>
 
               <!-- Escolha do que exportar no WhatsApp -->
-              <div class="bg-slate-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 mb-5 sm:mb-6">
-                <label class="label-standard text-center mb-2 sm:mb-3 text-[10px] sm:text-xs">O que você deseja compartilhar?</label>
-                <div class="grid grid-cols-2 gap-2">
+              <div class="bg-slate-50 p-4 sm:p-5 rounded-2xl border-2 border-slate-200 mb-6 sm:mb-8 shadow-inner">
+                <label class="label-standard text-center mb-4">O que você deseja compartilhar?</label>
+                <div class="grid grid-cols-2 gap-3">
                   <label class="segment-radio">
                     <input type="radio" name="wp_type" value="REL" checked onchange="generateWhatsAppReport()">
-                    <div class="segment-label !py-2 sm:!py-2"><i class="ph-duotone ph-file-text text-base sm:text-lg"></i> Relatório <br><span class="text-[8px] sm:text-[9px] font-normal">(Aba Relatórios)</span></div>
+                    <div class="segment-label">
+                      <i class="ph-duotone ph-file-text text-xl mb-1"></i> Dados de Relatório <br><span class="text-[9px] font-normal text-slate-400 mt-0.5">(Aba Relatórios)</span>
+                    </div>
                   </label>
                   <label class="segment-radio">
                     <input type="radio" name="wp_type" value="CHK" onchange="generateWhatsAppReport()">
-                    <div class="segment-label !py-2 sm:!py-2"><i class="ph-duotone ph-list-checks text-base sm:text-lg"></i> Resumo Inspeção <br><span class="text-[8px] sm:text-[9px] font-normal">(Aba Inspeção)</span></div>
+                    <div class="segment-label">
+                      <i class="ph-duotone ph-list-checks text-xl mb-1"></i> Resumo Inspeção <br><span class="text-[9px] font-normal text-slate-400 mt-0.5">(Aba Inspeção)</span>
+                    </div>
                   </label>
                 </div>
               </div>
 
-              <textarea id="whatsappOutput" class="w-full border-2 border-slate-200 rounded-xl px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-slate-800 bg-white focus:outline-none focus:border-green-500 min-h-[300px] sm:min-h-[350px] font-mono leading-relaxed resize-y shadow-inner"></textarea>
+              <textarea id="whatsappOutput" class="w-full border-2 border-slate-200 rounded-2xl px-4 sm:px-5 py-4 sm:py-5 text-sm text-slate-700 bg-white focus:outline-none focus:border-green-500 min-h-[350px] font-mono leading-relaxed resize-y shadow-sm"></textarea>
 
-              <button type="button" onclick="copyWhatsAppText()" class="w-full mt-4 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base hover:bg-green-700 transition-all shadow-lg shadow-green-600/30 active:scale-[0.98]">
-                <i class="ph-bold ph-copy text-lg sm:text-xl"></i> Copiar Texto
+              <button type="button" onclick="copyWhatsAppText()" class="w-full mt-6 flex items-center justify-center gap-2 bg-green-500 text-white px-4 py-4 rounded-xl font-black text-base hover:bg-green-600 transition-all shadow-lg shadow-green-500/30 active:scale-[0.98]">
+                <i class="ph-bold ph-copy text-xl"></i> Copiar Texto Pronto
               </button>
             </div>
           </div>
         </div>
 
         <!-- ================= PRÉ-VISUALIZAÇÃO A4 (Sempre Visível) ================= -->
-        <div class="no-print mt-8 sm:mt-10 pb-4 sm:pb-8" id="printPreviewContainer">
-          <div class="flex items-center justify-between mb-3 sm:mb-4 border-t border-slate-300 pt-5 sm:pt-6">
-             <div class="flex items-center gap-2 text-navy-800 font-black text-xs sm:text-sm uppercase tracking-wider">
-               <i class="ph-bold ph-printer text-lg sm:text-xl"></i> Pré-visualização (A4)
+        <div class="no-print mt-10 pb-6" id="printPreviewContainer">
+          <div class="flex items-center justify-between mb-4 border-t-2 border-slate-200 pt-6">
+             <div class="flex items-center gap-2 text-navy-800 font-black text-xs sm:text-sm uppercase tracking-wider bg-white px-4 py-2 rounded-lg border-2 border-slate-200 shadow-sm mx-auto sm:mx-0">
+               <i class="ph-bold ph-file-pdf text-brand-600 text-lg sm:text-xl"></i> Preview A4 (Ao Vivo)
              </div>
           </div>
           <!-- Container de Scroll Horizontal Suave -->
-          <div class="overflow-x-auto pb-4 custom-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
-            <div class="print-page shadow-xl border border-slate-300 mx-auto" id="printPage" style="transform-origin: top left; min-width: 210mm;">
-              <!-- O conteúdo da folha é injetado aqui -->
+          <div class="overflow-x-auto pb-6 custom-scrollbar -mx-3 px-3 sm:mx-0 sm:px-0">
+            <!-- Divisão do Fundo Cinza para dar a ilusão do papel na mesa -->
+            <div class="p-4 sm:p-8 bg-slate-200/50 rounded-2xl border border-slate-200 inline-block min-w-full">
+              <div class="print-page shadow-2xl border border-slate-300 mx-auto" id="printPage" style="transform-origin: top center; min-width: 210mm;">
+                <!-- O conteúdo da folha é injetado aqui -->
+              </div>
             </div>
           </div>
         </div>
@@ -576,19 +644,19 @@
     </main>
 
     <!-- Navigation Bar Inferior (Estilo App) -->
-    <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 z-50 px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.03)] no-print">
-      <div class="max-w-[1400px] mx-auto h-[68px] sm:h-20 flex justify-around items-center">
+    <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-slate-200 z-50 px-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.04)] no-print">
+      <div class="max-w-[1400px] mx-auto h-[76px] sm:h-20 flex justify-around items-center">
         <button class="nav-item active" onclick="switchTab('tab-inspecao', this)">
-          <i class="ph-fill ph-clipboard-text text-[24px] sm:text-3xl mb-0.5"></i>
-          <span class="text-[10px] sm:text-xs font-semibold tracking-wide">Inspeção</span>
+          <i class="ph-fill ph-clipboard-text text-[26px] sm:text-3xl mb-1"></i>
+          <span class="text-[10px] sm:text-xs font-bold tracking-wide">Inspeção</span>
         </button>
         <button class="nav-item" onclick="switchTab('tab-relatorios', this)">
-          <i class="ph-fill ph-files text-[24px] sm:text-3xl mb-0.5"></i>
-          <span class="text-[10px] sm:text-xs font-semibold tracking-wide">Relatórios</span>
+          <i class="ph-fill ph-files text-[26px] sm:text-3xl mb-1"></i>
+          <span class="text-[10px] sm:text-xs font-bold tracking-wide">Relatórios</span>
         </button>
         <button class="nav-item" onclick="switchTab('tab-whatsapp', this)">
-          <i class="ph-fill ph-whatsapp-logo text-[24px] sm:text-3xl mb-0.5"></i>
-          <span class="text-[10px] sm:text-xs font-semibold tracking-wide">WhatsApp</span>
+          <i class="ph-fill ph-whatsapp-logo text-[26px] sm:text-3xl mb-1"></i>
+          <span class="text-[10px] sm:text-xs font-bold tracking-wide">WhatsApp</span>
         </button>
       </div>
     </nav>
@@ -597,46 +665,67 @@
   <script>
     "use strict";
 
-    // ====== AUTHENTICATION ======
-    const SYSTEM_PASSWORD = "checkfire123";
+    // ====== ACESSO (SISTEMA GRATUITO) ======
+    let donationTimerStarted = false;
 
-    function checkAuth() {
-      const isAuth = localStorage.getItem('cf_auth') === 'true';
-      if (isAuth) { showApp(); } else { showLanding(); }
+    function openDonationModal() {
+      const modal = document.getElementById('donation-modal');
+      const content = document.getElementById('donation-modal-content');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      // Pequeno delay para a transição do Tailwind funcionar
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeDonationModal() {
+      const modal = document.getElementById('donation-modal');
+      const content = document.getElementById('donation-modal-content');
+      modal.classList.add('opacity-0');
+      content.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }, 300);
+    }
+
+    function startDonationTimer() {
+      if (!donationTimerStarted) {
+        donationTimerStarted = true;
+        // 20 minutos = 20 * 60 * 1000 = 1.200.000 milissegundos
+        setTimeout(() => {
+          openDonationModal();
+        }, 1200000);
+      }
+    }
+
+    function checkAccess() {
+      const hasVisited = localStorage.getItem('cf_visited') === 'true';
+      if (hasVisited) { showApp(); } else { showLanding(); }
     }
 
     function showLanding() {
       document.getElementById('view-landing').classList.remove('hidden');
-      document.getElementById('view-login').classList.add('hidden');
       document.getElementById('view-app').classList.add('hidden');
       document.getElementById('view-app').classList.remove('flex');
     }
 
-    function showLogin() {
-      document.getElementById('view-landing').classList.add('hidden');
-      document.getElementById('view-login').classList.remove('hidden');
-      document.getElementById('loginPassword').value = '';
-      setTimeout(() => document.getElementById('loginPassword').focus(), 100);
-    }
-
     function showApp() {
+      localStorage.setItem('cf_visited', 'true');
       document.getElementById('view-landing').classList.add('hidden');
-      document.getElementById('view-login').classList.add('hidden');
       document.getElementById('view-app').classList.remove('hidden');
       document.getElementById('view-app').classList.add('flex');
-    }
-
-    function handleLogin(e) {
-      e.preventDefault();
-      const pwd = document.getElementById('loginPassword').value;
-      if (pwd === SYSTEM_PASSWORD) {
-        localStorage.setItem('cf_auth', 'true');
-        showApp(); showToast("Login realizado com sucesso!");
-      } else { showToast("Senha incorreta. Tente novamente.", "error"); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Inicia a contagem de 20 minutos quando entra no App
+      startDonationTimer();
     }
 
     function handleLogout() {
-      localStorage.removeItem('cf_auth'); showLanding(); showToast("Você saiu do sistema.", "info");
+      showLanding(); 
+      showToast("Você voltou à tela inicial.", "info");
     }
 
     // ====== ESTADOS ======
@@ -658,7 +747,7 @@
       "Outro": ["Item identificado", "Acesso livre e sinalização", "Condição estrutural satisfatória", "Funcionamento verificado"]
     };
 
-    let logoData = "";
+    let logoData = "logo.png";
     let equipment = [];
 
     // ====== UTILITÁRIOS ======
@@ -675,7 +764,7 @@
       const toast = document.createElement('div');
       const icon = type === 'success' ? '<i class="ph-fill ph-check-circle text-green-400 text-xl sm:text-2xl"></i>' : type === 'error' ? '<i class="ph-fill ph-x-circle text-brand-500 text-xl sm:text-2xl"></i>' : '<i class="ph-fill ph-info text-blue-400 text-xl sm:text-2xl"></i>';
       toast.className = 'toast';
-      toast.innerHTML = `${icon} <span>${escapeHTML(message)}</span>`;
+      toast.innerHTML = `${icon} <span class="flex-1">${escapeHTML(message)}</span>`;
       container.appendChild(toast);
       setTimeout(() => toast.classList.add('show'), 10);
       setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
@@ -689,7 +778,7 @@
       reader.onload = e => {
         logoData = e.target.result;
         document.querySelectorAll(".logo-preview-container").forEach(el => {
-          el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-10 sm:max-h-12 object-contain" />`;
+          el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-12 object-contain p-1" onerror="this.style.display='none'" />`;
         });
         renderPrint();
       };
@@ -731,7 +820,7 @@
         checks: templates[tipo] || templates.Outro, geralObs: ""
       }));
       setValue("manualPatrimonio", ""); setValue("manualLocal", "");
-      showToast("Equipamento adicionado!"); renderList(); renderPrint();
+      showToast("Equipamento adicionado à lista!"); renderList(); renderPrint();
     }
 
     function removeEquipment(id) { equipment = equipment.filter(item => item.id !== id); renderList(); renderPrint(); }
@@ -744,18 +833,18 @@
     }
     function updateCheckObs(id, checkIndex, obs) { const item = equipment.find(x => x.id === id); if (item && item.checks[checkIndex]) { item.checks[checkIndex].obs = obs; renderPrint(); } }
     function resetAnswers() {
-      if(confirm("Apagar marcações C/NC/NA de todos os itens? O formulário ficará em branco e pronto para imprimir.")) {
+      if(confirm("Deseja limpar todas as marcações C/NC/NA? O formulário ficará em branco para impressão.")) {
         equipment.forEach(item => { item.checks.forEach(check => { check.status = ""; check.obs = ""; }); item.geralObs = ""; });
-        renderList(); renderPrint(); showToast("Formulário pronto para prancheta.");
+        renderList(); renderPrint(); showToast("Formulário limpo com sucesso.");
       }
     }
     function addExtintorAreaExample() {
-      const locais = ["Recepção", "Corredor A"];
+      const locais = ["Recepção", "Corredor Principal"];
       for (let i = 1; i <= 2; i++) {
         equipment.push(normalizeChecks({ id: makeId(), tipo: "Extintor", patrimonio: `EXT-0${i}`, local: locais[i-1], descricao: i%2===0?"CO2 6Kg":"PQS 6Kg", checks: templates.Extintor }));
       }
-      if (!getValue("setor")) setValue("setor", "Área Operacional");
-      renderList(); renderPrint(); showToast("Itens de exemplo gerados.");
+      if (!getValue("setor")) setValue("setor", "Área Administrativa");
+      renderList(); renderPrint(); showToast("Itens de exemplo inseridos.");
     }
 
     function renderList() {
@@ -764,10 +853,10 @@
       equipment = equipment.map(normalizeChecks);
 
       if (!equipment.length) {
-        el.innerHTML = `<div class="border-2 border-dashed border-slate-200 rounded-[1.25rem] sm:rounded-3xl p-8 sm:p-10 text-center flex flex-col items-center">
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-2xl sm:text-3xl mb-3"><i class="ph-duotone ph-clipboard-text"></i></div>
-            <h3 class="text-sm sm:text-base font-bold text-slate-700">Checklist Vazio</h3>
-            <p class="text-slate-500 text-[10px] sm:text-xs mt-1">Adicione itens no painel.</p>
+        el.innerHTML = `<div class="border-4 border-dashed border-slate-200 rounded-3xl p-10 text-center flex flex-col items-center">
+            <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center text-3xl mb-4"><i class="ph-duotone ph-clipboard-text"></i></div>
+            <h3 class="text-base font-black text-slate-700">Checklist Vazio</h3>
+            <p class="text-slate-500 text-xs mt-1 font-medium">Use a caixa ao lado para adicionar itens.</p>
           </div>`;
         return;
       }
@@ -777,47 +866,47 @@
         const checksHtml = item.checks.map((check, checkIndex) => {
           const isC = check.status === STATUS.CONFORME, isNC = check.status === STATUS.NAO_CONFORME, isNA = check.status === STATUS.NAO_APLICA;
           
-          /* Ajuste Mobile: flex-col e botões ocupando w-full */
+          /* Caixas perfeitamente alinhadas para os botoes C/NC/NA */
           return `
-            <div class="flex flex-col lg:flex-row gap-2 lg:gap-3 p-3 items-start lg:items-center border-b border-slate-100 hover:bg-slate-50 transition-colors">
-              <div class="flex-1 w-full flex items-start lg:items-center gap-1.5 sm:gap-2">
-                <span class="text-slate-400 font-bold text-[10px] sm:text-xs mt-1 lg:mt-0 w-3 sm:w-4">${checkIndex + 1}.</span> 
-                <input type="text" value="${escapeHTML(check.text)}" class="inline-edit text-xs sm:text-sm font-medium text-navy-800 py-1 flex-1 min-w-0" onchange="updateCheckText('${item.id}', ${checkIndex}, this.value)" title="Editar pergunta">
+            <div class="flex flex-col lg:flex-row gap-3 p-3 lg:p-4 items-start lg:items-center border-b-2 border-slate-100 hover:bg-slate-50 transition-colors last:border-0">
+              <div class="flex-1 w-full flex items-start gap-2">
+                <span class="text-slate-400 font-black text-xs mt-1.5 w-5 text-right">${checkIndex + 1}.</span> 
+                <input type="text" value="${escapeHTML(check.text)}" class="inline-edit text-xs sm:text-sm font-semibold text-navy-800 py-1 flex-1 min-w-0" onchange="updateCheckText('${item.id}', ${checkIndex}, this.value)" title="Editar pergunta">
               </div>
-              <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
-                <div class="flex p-1 bg-slate-100 rounded-lg shrink-0 gap-1 shadow-inner w-full sm:w-auto justify-between sm:justify-start">
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="flex-1 sm:flex-none sm:w-10 h-10 sm:h-8 rounded text-xs font-bold transition-all ${isC ? 'bg-green-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">C</button>
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="flex-1 sm:flex-none sm:w-10 h-10 sm:h-8 rounded text-xs font-bold transition-all ${isNC ? 'bg-brand-500 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NC</button>
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="flex-1 sm:flex-none sm:w-10 h-10 sm:h-8 rounded text-xs font-bold transition-all ${isNA ? 'bg-slate-400 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-white'}">NA</button>
+              <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
+                <div class="flex bg-slate-100 border border-slate-200 rounded-xl p-1 w-full sm:w-auto justify-between sm:justify-start gap-1 shadow-inner">
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="flex-1 sm:w-12 h-10 sm:h-9 rounded-lg text-xs font-black transition-all ${isC ? 'bg-green-500 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">C</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="flex-1 sm:w-12 h-10 sm:h-9 rounded-lg text-xs font-black transition-all ${isNC ? 'bg-brand-500 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">NC</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="flex-1 sm:w-12 h-10 sm:h-9 rounded-lg text-xs font-black transition-all ${isNA ? 'bg-slate-400 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">NA</button>
                 </div>
-                <input type="text" class="w-full sm:w-32 border border-slate-200 rounded-lg px-2 py-2 sm:py-1.5 text-xs focus:border-brand-500 outline-none placeholder-slate-400" placeholder="Obs..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
+                <input type="text" class="w-full sm:w-40 border-2 border-slate-200 rounded-xl px-3 py-2.5 sm:py-2 text-xs font-medium focus:border-brand-500 focus:bg-white bg-slate-50 outline-none placeholder-slate-400 transition-all" placeholder="Observações..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
               </div>
             </div>`;
         }).join("");
 
         return `
-          <div class="bg-white border border-slate-200 rounded-[1.25rem] sm:rounded-2xl p-3.5 sm:p-4 shadow-sm hover:border-brand-200 transition-colors">
-            <div class="flex flex-row justify-between items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div class="flex items-start sm:items-center gap-3 w-full min-w-0">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-navy-50 flex items-center justify-center text-brand-600 text-xl sm:text-2xl border border-navy-100 shrink-0 mt-1 sm:mt-0"><i class="ph-duotone ${iconClass}"></i></div>
+          <div class="bg-white border-2 border-slate-200 rounded-[1.25rem] sm:rounded-3xl p-4 sm:p-5 shadow-sm hover:border-brand-200 transition-colors">
+            <div class="flex flex-row justify-between items-start gap-3 mb-4 sm:mb-5">
+              <div class="flex items-start sm:items-center gap-3 sm:gap-4 w-full min-w-0">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-navy-50 flex items-center justify-center text-brand-600 text-2xl border border-navy-100 shrink-0 mt-1 sm:mt-0 shadow-sm"><i class="ph-duotone ${iconClass}"></i></div>
                 <div class="w-full flex-1 min-w-0">
-                  <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-0.5 w-full">
+                  <div class="flex flex-wrap items-center gap-2 mb-1 w-full">
                     <input type="text" value="${escapeHTML(item.tipo)}" class="inline-edit font-black text-navy-800 text-sm sm:text-base truncate min-w-[100px] max-w-full sm:max-w-[200px]" onchange="updateEquipmentField('${item.id}', 'tipo', this.value)">
-                    <div class="flex items-center bg-brand-50 text-brand-700 rounded-md px-1.5 py-0.5 shrink-0 border border-brand-100">
-                       <i class="ph-bold ph-barcode text-[9px] sm:text-[10px] mr-1"></i>
-                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-[9px] sm:text-xs font-bold w-12 sm:w-16 outline-none" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
+                    <div class="flex items-center bg-brand-50 text-brand-700 rounded-lg px-2 py-0.5 shrink-0 border border-brand-100 font-bold shadow-sm">
+                       <i class="ph-bold ph-barcode text-[10px] mr-1"></i>
+                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-[10px] sm:text-xs w-12 sm:w-20 outline-none text-center" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
                     </div>
                   </div>
-                  <div class="flex items-center text-[10px] sm:text-xs text-slate-500 w-full truncate mt-1 sm:mt-0">
-                    <i class="ph-fill ph-map-pin mr-1 text-slate-400 shrink-0"></i><input type="text" value="${escapeHTML(item.local)}" class="inline-edit flex-1 px-1 min-w-0 truncate" onchange="updateEquipmentField('${item.id}', 'local', this.value)">
+                  <div class="flex items-center text-xs text-slate-500 w-full truncate font-medium bg-slate-50 border border-slate-100 rounded-md px-2 py-1">
+                    <i class="ph-fill ph-map-pin mr-1.5 text-slate-400 shrink-0"></i><input type="text" value="${escapeHTML(item.local)}" class="inline-edit flex-1 px-1 min-w-0 truncate" onchange="updateEquipmentField('${item.id}', 'local', this.value)">
                   </div>
                 </div>
               </div>
-              <button type="button" onclick="removeEquipment('${item.id}')" class="text-slate-400 hover:text-brand-600 bg-slate-50 p-2 rounded-lg shrink-0"><i class="ph-bold ph-trash text-lg"></i></button>
+              <button type="button" onclick="removeEquipment('${item.id}')" class="text-slate-400 hover:text-white bg-slate-50 hover:bg-brand-600 p-2 sm:p-2.5 rounded-xl shrink-0 transition-colors border border-slate-200 hover:border-brand-600"><i class="ph-bold ph-trash text-lg"></i></button>
             </div>
-            <div class="border border-slate-200 rounded-xl overflow-hidden bg-white">
-              <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">Verificações</div>
-              <div class="divide-y divide-slate-100">${checksHtml}</div>
+            <div class="border-2 border-slate-100 rounded-2xl overflow-hidden bg-white">
+              <div class="bg-slate-50 border-b-2 border-slate-100 px-4 py-2.5 text-[10px] font-black text-slate-500 uppercase tracking-wider">Itens de Verificação</div>
+              <div>${checksHtml}</div>
             </div>
           </div>`;
       }).join("");
@@ -872,7 +961,6 @@ ${conc}
 ${eqp}`;
 
       } else {
-        // Resumo de Checklist
         const emp = getValue("empresa") || "Empresa não inf.";
         const data = formatDateBR(getValue("data")) || "[Data]";
         const resp = getValue("responsavel") || "Inspetor não inf.";
@@ -903,16 +991,11 @@ ${eqp}`;
 ➖ Não Aplicáveis: ${totalNA}
 
 `;
-        if (totalNC > 0) {
-          text += `*⚠️ PONTOS DE ATENÇÃO (NÃO CONFORMES):*\n${ncList.join("\n\n")}\n\n`;
-        } else if (equipment.length > 0) {
-           text += `*✨ Nenhuma Não Conformidade encontrada nos itens avaliados.*\n\n`;
-        } else {
-           text += `(Nenhum equipamento adicionado ao checklist ainda)\n\n`;
-        }
+        if (totalNC > 0) { text += `*⚠️ PONTOS DE ATENÇÃO (NÃO CONFORMES):*\n${ncList.join("\n\n")}\n\n`; } 
+        else if (equipment.length > 0) { text += `*✨ Nenhuma Não Conformidade encontrada nos itens avaliados.*\n\n`; } 
+        else { text += `(Nenhum equipamento adicionado ao checklist ainda)\n\n`; }
         text += `_Relatório gerado via CheckFire Pro_`;
       }
-
       document.getElementById("whatsappOutput").value = text;
     }
 
@@ -922,19 +1005,19 @@ ${eqp}`;
       const textarea = document.createElement("textarea");
       textarea.value = text; textarea.style.position = "fixed"; textarea.style.opacity = "0";
       document.body.appendChild(textarea); textarea.select();
-      try { document.execCommand("copy"); showToast("Relatório copiado!"); } 
+      try { document.execCommand("copy"); showToast("Relatório copiado para a área de transferência!"); } 
       catch (err) { showToast("Erro ao copiar.", "error"); } 
       finally { document.body.removeChild(textarea); }
     }
 
-    // ====== IMPRESSÃO ======
+    // ====== IMPRESSÃO / GERAR PDF ======
     function mark(status, expected) { return status === expected ? "X" : ""; }
 
     function renderPrint() {
       const printPage = document.getElementById("printPage");
       if (!printPage) return;
       
-      const logoHTML = logoData ? `<img src="${logoData}" alt="Logo" />` : 'LOGO DA<br>EMPRESA';
+      const logoHTML = logoData ? `<img src="${logoData}" alt="Logo" onerror="this.style.display='none'" />` : 'LOGO DA<br>EMPRESA';
       const codigoDoc = escapeHTML(getValue("codigo")) || "FR-001";
       const versaoDoc = escapeHTML(getValue("versao")) || "Rev.00";
       const periodoDoc = escapeHTML(getValue("periodicidade")) || "Mensal";
@@ -1034,7 +1117,33 @@ ${eqp}`;
       }
     }
 
-    function triggerPrint() { renderPrint(); try { window.print(); } catch(e) { showToast("Use Ctrl+P (ou Cmd+P) para imprimir.", "info"); } }
+    // Gerador de PDF robusto (html2pdf)
+    function downloadPDF() {
+      renderPrint();
+      showToast("Gerando arquivo PDF... Aguarde.", "info");
+      
+      const element = document.getElementById('printPage');
+      const opt = {
+        margin:       0,
+        filename:     `CheckFire_${getValue("codigo") || "Documento"}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        showToast("PDF baixado com sucesso!");
+      }).catch(e => {
+        showToast("Erro ao gerar PDF. Tente novamente.", "error");
+        console.error(e);
+      });
+    }
+
+    function triggerPrint() { 
+      // O botao print ainda existe se preferir a impressora
+      renderPrint(); 
+      try { window.print(); } catch(e) { showToast("Use Ctrl+P para imprimir.", "info"); } 
+    }
 
     // ====== DB LOCAL E INIT ======
     function saveLocal() {
@@ -1050,14 +1159,14 @@ ${eqp}`;
       if (!saved) return;
       try {
         const payload = JSON.parse(saved);
-        logoData = payload.logoData || "";
+        if (payload.logoData) { logoData = payload.logoData; }
         equipment = (payload.equipment || []).map(normalizeChecks);
         if(payload.rel_categoria) setRadioValue("rel_categoria", payload.rel_categoria);
         Object.keys(payload).forEach(id => { if (id !== "logoData" && id !== "equipment" && id !== "rel_categoria") setValue(id, payload[id]); });
         
         if (logoData) {
           document.querySelectorAll(".logo-preview-container").forEach(el => {
-            el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-10 sm:max-h-12 object-contain" />`;
+            el.innerHTML = `<img src="${logoData}" alt="Logo" class="max-h-12 object-contain p-1" onerror="this.style.display='none'" />`;
           });
         }
       } catch (e) { console.error(e); }
@@ -1069,9 +1178,8 @@ ${eqp}`;
       if (d1 && !d1.value) d1.value = hoje;
       if (d2 && !d2.value) d2.value = hoje;
       
-      loadLocal(); checkAuth(); renderList(); renderPrint();
+      loadLocal(); checkAccess(); renderList(); renderPrint();
 
-      // Registro do Service Worker PWA
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('sw.js').catch(err => console.log('PWA SW Error:', err));
