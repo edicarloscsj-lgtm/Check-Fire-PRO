@@ -74,13 +74,18 @@
     }
     .segment-radio input[type="radio"]:checked + .segment-label i { color: #d90429; }
 
+    /* Inputs invisíveis editáveis in-line agora com bordas vermelhas claras */
+    .inline-edit { background: #fffafb; border: 1px solid #ef4444; width: 100%; transition: all 0.2s; text-overflow: ellipsis; outline: none; padding: 4px 8px; border-radius: 8px; font-weight: 600; color: #1e293b; }
+    .inline-edit:hover { border-color: #d90429; background: #fff0f2; }
+    .inline-edit:focus { border-color: #d90429; background: white; border-width: 2px; padding: 3px 7px; box-shadow: 0 0 0 3px rgba(217, 4, 41, 0.1); }
+
     /* Componentes App Native */
     .app-main-container { padding-bottom: 100px; }
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ESTILOS DE IMPRESSÃO - REESCRITOS PARA FLEXBOX (FIX BUG PDF) */
+    /* ESTILOS DE IMPRESSÃO - REESCRITOS PARA FLEXBOX (FIX BUG PDF HTML2CANVAS) */
     .print-page { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; }
     
     .print-header { display: flex; align-items: stretch; border: 1px solid #000; margin-bottom: 6px; min-height: 32mm; width: 100%; }
@@ -94,17 +99,17 @@
     .print-code div:last-child { border-bottom: 0; }
 
     .print-info { display: flex; width: 100%; border: 1px solid #000; border-bottom: 0; font-size: 8.5px; }
-    .print-info > div { flex: 1; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px; min-height: 8.5mm; box-sizing: border-box; }
+    .print-info > div { flex: 1; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px; min-height: 8.5mm; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; }
     .print-info > div:last-child { border-right: 0; }
     .print-info strong { display: block; font-size: 7.5px; text-transform: uppercase; margin-bottom: 2px; color: #333; }
     
     .print-info-occ { display: flex; width: 100%; border: 1px solid #000; border-bottom: 0; font-size: 9px; }
-    .print-info-occ > div { flex: 1; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; box-sizing: border-box; }
+    .print-info-occ > div { flex: 1; border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 5px; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; }
     .print-info-occ > div:last-child { border-right: 0; }
     .print-info-occ strong { display: block; font-size: 8px; text-transform: uppercase; margin-bottom: 2px; color: #333; }
 
     .occ-section-title { background: #f1f5f9; border: 1px solid #000; border-bottom: 0; padding: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; text-align: center; }
-    .occ-textarea-box { border: 1px solid #000; border-bottom: 0; padding: 6px; font-size: 10px; min-height: 25mm; white-space: pre-wrap; width: 100%; box-sizing: border-box; }
+    .occ-textarea-box { border: 1px solid #000; border-bottom: 0; padding: 6px; font-size: 10px; min-height: 25mm; white-space: pre-wrap; width: 100%; box-sizing: border-box; word-break: break-word; overflow-wrap: break-word; }
 
     .legend { font-size: 8px; margin: 6px 0; display: flex; gap: 12px; flex-wrap: wrap; }
     .legend strong { text-transform: uppercase; }
@@ -119,7 +124,7 @@
     .equipment-print-title > div:nth-child(5) { flex: 1; border-right: 0; }
 
     .subcheck-table { width: 100%; border-collapse: collapse; font-size: 8px; table-layout: fixed; }
-    .subcheck-table th, .subcheck-table td { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px; vertical-align: middle; word-wrap: break-word; }
+    .subcheck-table th, .subcheck-table td { border-right: 1px solid #000; border-bottom: 1px solid #000; padding: 4px; vertical-align: middle; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; }
     .subcheck-table tr:last-child td { border-bottom: 0; }
     .subcheck-table th:last-child, .subcheck-table td:last-child { border-right: 0; }
     .subcheck-table th { background: #f8fafc; text-transform: uppercase; font-size: 7.5px; text-align: left; }
@@ -129,8 +134,23 @@
     .col-num { width: 12mm; } .col-local { width: 45mm; } .col-desc { width: 25mm; }
     .col-check { width: 13mm; } .col-obs { width: auto; }
 
-    .vertical-th { height: 38mm !important; padding: 0 !important; text-align: center; vertical-align: bottom !important; position: relative; }
-    .vertical-th > span { display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); white-space: normal; line-height: 1.1; max-height: 36mm; font-size: 6.8px; font-weight: bold; padding: 2px 0; }
+    /* Fix para evitar letras espalhadas no celular (html2pdf bug writing-mode) */
+    .vertical-th { height: 42mm !important; padding: 0 !important; text-align: center; vertical-align: bottom !important; position: relative; }
+    .vertical-text {
+      position: absolute;
+      transform: rotate(-90deg);
+      transform-origin: left top;
+      left: 50%;
+      bottom: 4px;
+      width: 38mm;
+      margin-left: 4px;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 7px;
+    }
+    
     .mark { text-align: center !important; font-weight: bold; font-size: 10px; }
 
     .signature-area { display: flex; justify-content: space-between; gap: 15mm; margin-top: 16mm; font-size: 9px; page-break-inside: avoid; width: 100%; }
@@ -141,10 +161,10 @@
     .toast { background: #1a2942; color: white; padding: 14px 18px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(-20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 10px; pointer-events: auto; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* UI CAIXAS ESTRUTURADAS E DEFINIDAS */
+    /* UI CAIXAS ESTRUTURADAS E DEFINIDAS - BORDAS VERMELHAS */
     .form-group { display: flex; flex-direction: column; gap: 6px; width: 100%; }
     .form-group-label { font-size: 11px; font-weight: 800; color: #1a2942; text-transform: uppercase; letter-spacing: 0.05em; padding-left: 2px; }
-    .form-group-input { width: 100%; border: 2px solid #e2e8f0; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 500; color: #1e293b; background-color: #f8fafc; transition: all 0.2s; outline: none; }
+    .form-group-input { width: 100%; border: 2px solid #ef4444; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 600; color: #1e293b; background-color: #fffbfc; transition: all 0.2s; outline: none; }
     .form-group-input:focus { background-color: #ffffff; border-color: #d90429; box-shadow: 0 0 0 4px rgba(217, 4, 41, 0.1); }
     .form-group-input::placeholder { color: #94a3b8; font-weight: 400; }
     
@@ -862,16 +882,16 @@
           return `
             <div class="flex flex-col lg:flex-row gap-3 p-4 items-start lg:items-center border-b-2 border-slate-100 hover:bg-slate-50 transition-colors last:border-0">
               <div class="flex-1 w-full flex items-start gap-2">
-                <span class="text-slate-400 font-black text-sm mt-1 w-5 text-right shrink-0">${checkIndex + 1}.</span> 
+                <span class="text-slate-400 font-black text-sm mt-1.5 w-5 text-right shrink-0">${checkIndex + 1}.</span> 
                 <input type="text" value="${escapeHTML(check.text)}" class="inline-edit text-sm font-semibold text-navy-800 py-1 flex-1 min-w-0" onchange="updateCheckText('${item.id}', ${checkIndex}, this.value)" title="Editar pergunta">
               </div>
               <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto shrink-0 mt-2 lg:mt-0">
                 <div class="flex bg-slate-100 border border-slate-200 rounded-xl p-1 w-full sm:w-auto justify-between sm:justify-start gap-1 shadow-inner">
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="flex-1 sm:w-12 h-10 rounded-lg text-xs font-black transition-all ${isC ? 'bg-green-500 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">C</button>
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="flex-1 sm:w-12 h-10 rounded-lg text-xs font-black transition-all ${isNC ? 'bg-brand-500 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">NC</button>
-                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="flex-1 sm:w-12 h-10 rounded-lg text-xs font-black transition-all ${isNA ? 'bg-slate-400 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">NA</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.CONFORME}')" class="flex-1 sm:w-12 h-10 sm:h-9 rounded-lg text-xs font-black transition-all ${isC ? 'bg-green-500 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">C</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_CONFORME}')" class="flex-1 sm:w-12 h-10 sm:h-9 rounded-lg text-xs font-black transition-all ${isNC ? 'bg-brand-500 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">NC</button>
+                  <button type="button" onclick="updateCheckStatus('${item.id}', ${checkIndex}, '${STATUS.NAO_APLICA}')" class="flex-1 sm:w-12 h-10 sm:h-9 rounded-lg text-xs font-black transition-all ${isNA ? 'bg-slate-400 text-white shadow-md' : 'text-slate-500 hover:bg-white'}">NA</button>
                 </div>
-                <input type="text" class="w-full sm:w-48 border-2 border-slate-200 rounded-xl px-3 py-2.5 text-xs font-medium focus:border-brand-500 focus:bg-white bg-slate-50 outline-none placeholder-slate-400 transition-all" placeholder="Observações do item..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
+                <input type="text" class="w-full sm:w-48 border-2 border-brand-500 rounded-xl px-3 py-2.5 sm:py-2 text-xs font-semibold focus:border-brand-700 focus:bg-white bg-red-50/20 outline-none placeholder-slate-400 transition-all" placeholder="Observações do item..." value="${escapeHTML(check.obs)}" onchange="updateCheckObs('${item.id}', ${checkIndex}, this.value)" />
               </div>
             </div>`;
         }).join("");
@@ -886,7 +906,7 @@
                     <input type="text" value="${escapeHTML(item.tipo)}" class="inline-edit font-black text-navy-800 text-base truncate min-w-[120px] max-w-full sm:max-w-[250px]" onchange="updateEquipmentField('${item.id}', 'tipo', this.value)">
                     <div class="flex items-center bg-brand-50 text-brand-700 rounded-lg px-2.5 py-1 shrink-0 border border-brand-100 font-bold shadow-sm">
                        <i class="ph-bold ph-barcode text-[10px] mr-1"></i>
-                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-xs w-16 sm:w-20 outline-none text-center" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
+                       <input type="text" value="${escapeHTML(item.patrimonio)}" class="bg-transparent border-none text-xs w-16 sm:w-20 outline-none text-center font-bold text-brand-800" onchange="updateEquipmentField('${item.id}', 'patrimonio', this.value)">
                     </div>
                   </div>
                   <div class="flex items-center text-sm text-slate-500 w-full truncate font-medium bg-slate-50 border border-slate-100 rounded-lg px-2.5 py-1.5">
@@ -1023,7 +1043,7 @@ ${eqp}`;
           const items = grouped[tipo];
           if (items.length >= 6 && items[0].checks.length > 0) {
             const checksTexts = items[0].checks.map(c => c.text);
-            const headers = checksTexts.map(ct => `<th class="vertical-th col-check"><span>${escapeHTML(ct.substring(0,40))}</span></th>`).join("");
+            const headers = checksTexts.map(ct => `<th class="col-check vertical-th"><div class="vertical-text">${escapeHTML(ct)}</div></th>`).join("");
             const rows = items.map(item => {
               const cells = checksTexts.map(cName => {
                 const f = item.checks.find(c => c.text === cName);
@@ -1032,7 +1052,7 @@ ${eqp}`;
               const obs = item.checks.filter(c=>c.obs).map(c=>c.obs).join(" | ") || item.geralObs;
               return `<tr><td class="mark" style="font-size:7px">${escapeHTML(item.patrimonio)}</td><td style="font-weight:bold; font-size:7px">${escapeHTML(item.local)}</td><td style="font-size:7px">${escapeHTML(item.descricao)}</td>${cells}<td>${escapeHTML(obs)}</td></tr>`;
             }).join("");
-            return `<div class="equipment-print-block"><div style="background:#f1f5f9; padding:5px; border-bottom:1px solid #000; font-size:8.5px; font-weight:bold; text-transform:uppercase; width:100%;">Relatório de Área Massiva (${items.length} unidades do tipo ${tipo})</div><table class="subcheck-table compact-ext-table"><thead><tr><th class="vertical-th col-num"><span>Patrimônio</span></th><th class="vertical-th col-local"><span>Localização</span></th><th class="vertical-th col-desc"><span>Descrição</span></th>${headers}<th class="vertical-th col-obs"><span>Observações</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+            return `<div class="equipment-print-block"><div class="equipment-print-title"><div>Nº</div><div>Área Massiva</div><div>Relatório de Equipamentos do Tipo: ${tipo}</div><div>Itens relacionados: ${items.length}</div><div></div></div><table class="subcheck-table compact-ext-table"><thead><tr><th class="col-num"><span>Patrimônio</span></th><th class="col-local"><span>Localização</span></th><th class="col-desc"><span>Descrição</span></th>${headers}<th class="col-obs"><span>Observações</span></th></tr></thead><tbody>${rows}</tbody></table></div>`;
           }
           
           return items.map((item, index) => {
